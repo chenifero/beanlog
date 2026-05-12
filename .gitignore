@@ -33,3 +33,7 @@ supabase/.temp
 .claude/
 .agents/
 skills/
+skills-lock.json
+
+# Notas privadas de desarrollo
+TODO.TXT
