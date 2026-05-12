@@ -1,0 +1,163 @@
+/* Sidebar principal — transición suave entre expandida y colapsada */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  z-index: 100;
+  /* La transición hace que el cambio de ancho sea suave */
+  transition: width var(--transition-base);
+}
+
+/* Cuando está colapsada solo ocupa 60px */
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.sidebar-header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  gap: var(--spacing-sm);
+}
+
+.sidebar-logo-img {
+  width: 130px;
+  object-fit: contain;
+}
+
+/* Botón de colapsar/expandir */
+.sidebar-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-base);
+  font-size: 0.9rem;
+}
+
+.sidebar-toggle:hover {
+  background: var(--amber-subtle);
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+/* Cuando está colapsada, el toggle se centra */
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--spacing-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--text-dim);
+  transition: all var(--transition-base);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+}
+
+/* Cuando está colapsada, los links se centran */
+.sidebar.collapsed .nav-link {
+  justify-content: center;
+  padding: var(--spacing-md);
+}
+
+.nav-link:hover {
+  background-color: rgba(195, 73, 238, 0.05);
+  color: var(--text);
+}
+
+.nav-link.active {
+  background-color: var(--amber-subtle);
+  color: var(--amber);
+  border-left-color: var(--amber);
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-label {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+}
+
+.sidebar-footer {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Cuando está colapsada el avatar se centra */
+.sidebar.collapsed .user-profile {
+  justify-content: center;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cream);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+}

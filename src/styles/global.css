@@ -1,0 +1,110 @@
+/* BeanLog — CSS Design Tokens */
+
+:root {
+  /* Fondos */
+  --bg: #ebf6c9;
+  --surface: #c8e0a0;
+  --surface2: #ebf6c9;
+  --sidebar-bg: #e0f0b5;
+  --border: #aaca82;
+
+  /* Texto */
+  --cream: #3a1a6e;        /* Títulos principales */
+  --text: #2e1560;         /* Cuerpo */
+  --text-dim: #7a4faa;     /* Metadatos, subtítulos */
+  --muted: #9b72cc;        /* Labels inactivos, placeholders */
+
+  /* Acento (identidad de marca) */
+  --amber: #c349ee;                      /* CTAs, botones primarios, activo */
+  --amber-soft: #8ca7f4;                 /* Valores destacados, hover */
+  --amber-subtle: rgba(195, 73, 238, 0.12); /* Fondos highlight suaves */
+
+  /* Tipografía */
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'DM Sans', sans-serif;
+
+  /* Espaciado */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Bordes */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Transiciones */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estilos base */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  font-family: var(--font-sans);
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Utilidades de texto */
+.text-heading {
+  color: var(--cream);
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
+
+.text-body {
+  color: var(--text);
+}
+
+.text-dim {
+  color: var(--text-dim);
+  font-size: 0.875rem;
+}
+
+.text-muted {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+/* Utilidades de color */
+.bg-surface {
+  background-color: var(--surface);
+}
+
+.bg-surface2 {
+  background-color: var(--surface2);
+}
+
+.border-default {
+  border-color: var(--border);
+}
+
+/* Soporte para prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

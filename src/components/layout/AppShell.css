@@ -1,0 +1,33 @@
+.app-shell {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  /* El margen izquierdo se ajusta al ancho de la sidebar expandida */
+  padding-left: 220px;
+  transition: padding-left var(--transition-base);
+}
+
+/* Cuando la sidebar está colapsada, el contenido ocupa más espacio */
+.app-shell.sidebar-collapsed {
+  padding-left: 60px;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  /* En móvil no hay sidebar, el padding desaparece */
+  .app-shell {
+    padding-left: 0;
+  }
+
+  .app-main {
+    padding-bottom: 64px;
+  }
+}

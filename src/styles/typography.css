@@ -1,0 +1,144 @@
+/* Tipografía — Playfair Display + DM Sans */
+
+/* Encabezados */
+h1 {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--cream);
+  margin-bottom: var(--spacing-md);
+}
+
+h2 {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--cream);
+  margin-bottom: var(--spacing-md);
+}
+
+h3 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--cream);
+  margin-bottom: var(--spacing-sm);
+}
+
+h4 {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--cream);
+  margin-bottom: var(--spacing-sm);
+}
+
+h5 {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--cream);
+  margin-bottom: var(--spacing-xs);
+}
+
+h6 {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-dim);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Párrafos y cuerpo */
+p {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: var(--spacing-md);
+}
+
+small {
+  font-size: 0.875rem;
+  color: var(--text-dim);
+}
+
+/* Enlaces */
+a {
+  color: var(--amber);
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+a:hover {
+  color: var(--amber-soft);
+}
+
+a:active {
+  color: var(--amber);
+}
+
+/* Énfasis */
+strong, b {
+  font-weight: 600;
+  color: var(--cream);
+}
+
+em, i {
+  font-style: italic;
+}
+
+/* Código */
+code, pre {
+  font-family: 'Courier New', monospace;
+  background-color: var(--surface2);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  color: var(--cream);
+}
+
+pre {
+  overflow-x: auto;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Listas */
+ul, ol {
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-lg);
+}
+
+li {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Blockquotes */
+blockquote {
+  border-left: 4px solid var(--amber);
+  padding-left: var(--spacing-md);
+  margin-left: 0;
+  margin-bottom: var(--spacing-md);
+  font-style: italic;
+  color: var(--text-dim);
+}
+
+/* Línea horizontal */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: var(--spacing-xl) 0;
+}
+
+/* Puntuaciones numéricas (Playfair Display) */
+.score, .number {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--amber);
+}
