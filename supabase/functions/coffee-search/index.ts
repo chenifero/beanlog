@@ -95,6 +95,9 @@ Responde SOLO con este JSON:
     let result
     try {
       result = JSON.parse(rawContent)
+      Object.keys(result).forEach(key => {
+        if (result[key] === 'null') result[key] = null
+      })
     } catch {
       result = { found: false, summary: 'No se encontró información de compra' }
     }

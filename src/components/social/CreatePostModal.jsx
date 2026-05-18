@@ -140,7 +140,7 @@ export default function CreatePostModal({ onClose, onPostCreated }) {
             autoFocus
           />
 
-          {/* Input de ubicación manual — aparece al pulsar el botón 📍 */}
+          {/* Input de ubicación manual — aparece al pulsar el botón de localización */}
           {showLocationInput && (
             <div className="modal-location-input-wrapper">
               <input

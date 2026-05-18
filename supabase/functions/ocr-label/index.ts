@@ -33,7 +33,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.2-11b-vision-preview',
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         max_tokens: 500,
         messages: [
           {
@@ -67,7 +67,9 @@ Responde SOLO con este JSON sin texto adicional ni markdown:
     })
 
     const groqData = await groqRes.json()
+    console.log('Groq raw response:', JSON.stringify(groqData))
     const rawContent = groqData.choices?.[0]?.message?.content || '{}'
+    console.log('Raw content:', rawContent)
 
     // Parsea la respuesta
     let result

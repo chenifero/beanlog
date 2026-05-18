@@ -1,0 +1,101 @@
+.mis-cafes-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  position: relative;
+}
+
+.mis-cafes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.mis-cafes-title {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin: 0;
+}
+
+.mis-cafes-new-btn {
+  background: var(--amber);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.mis-cafes-new-btn:hover {
+  background: var(--amber-soft);
+  transform: translateY(-1px);
+}
+
+.mis-cafes-loading,
+.mis-cafes-empty {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.mis-cafes-empty p:first-child {
+  font-size: 3rem;
+}
+
+.mis-cafes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.mis-cafes-fab {
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  right: var(--spacing-lg);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--amber);
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(195, 73, 238, 0.4);
+  z-index: 99;
+  transition: all var(--transition-base);
+}
+
+.mis-cafes-fab:hover {
+  background: var(--amber-soft);
+  transform: scale(1.05);
+}
+
+@media (max-width: 767px) {
+  .mis-cafes-page {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .mis-cafes-new-btn {
+    display: none;
+  }
+
+  .mis-cafes-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

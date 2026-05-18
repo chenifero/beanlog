@@ -1,0 +1,122 @@
+.tasting-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color var(--transition-base);
+}
+
+.tasting-card:hover {
+  border-color: var(--amber);
+}
+
+.tasting-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  cursor: pointer;
+  gap: var(--spacing-md);
+}
+
+.tasting-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tasting-card-name {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--cream);
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tasting-card-meta {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.tasting-card-meta span {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.tasting-card-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.tasting-card-score {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.tasting-card-expand {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* Detalle */
+.tasting-card-detail {
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.tasting-card-radar {
+  background: var(--surface2);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.tasting-card-notes-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+
+.tasting-card-notes-text {
+  font-size: 0.875rem;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.tasting-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tasting-card-date {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.tasting-card-delete {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-base);
+}
+
+.tasting-card-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+}

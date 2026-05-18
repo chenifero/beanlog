@@ -12,6 +12,7 @@ import RegisterPage from '@/pages/RegisterPage'
 import SettingsPage from '@/pages/SettingsPage'
 import { SidebarProvider } from '@/context/SidebarContext'
 import ProfilePages from '@/pages/ProfilePages'
+import MisCafesPage from '@/pages/MisCafesPage'
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()
@@ -41,9 +42,10 @@ function AppRoutes() {
             <AppShell>
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/profile" element={<ProfilePages />} />
+                <Route path="/cafes" element={<MisCafesPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </AppShell>
           ) : (
