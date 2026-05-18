@@ -47,18 +47,20 @@ serve(async (req) => {
               },
               {
                 type: 'text',
-                text: `Analiza esta etiqueta de café de especialidad y extrae la información. 
-Responde SOLO con este JSON sin texto adicional ni markdown:
-{
-  "nombre": "nombre del café o marca",
-  "origen": "país o región de origen",
-  "finca": "nombre de la finca si aparece o null",
-  "proceso": "proceso de beneficio (lavado, natural, honey, etc.) o null",
-  "tueste": "nivel de tueste (claro, medio, oscuro, etc.) o null",
-  "variedad": "variedad del café si aparece o null",
-  "altitud": "altitud si aparece o null",
-  "notas": "notas de cata si aparecen o null"
-}`
+                text: `Analiza esta etiqueta de café de especialidad y extrae la información.
+                Responde SOLO con este JSON sin texto adicional ni markdown:
+                {
+                  "marca": "marca o tostadora que elabora el café o null",
+                  "nombre": "nombre específico del café (origen, finca o blend) o null",
+                  "origen": "país o región de origen o null",
+                  "finca": "nombre de la finca si aparece o null",
+                  "proceso": "proceso de beneficio (lavado, natural, honey, etc.) o null",
+                  "tueste": "nivel de tueste (claro, medio, oscuro, etc.) o null",
+                  "variedad": "variedad del café si aparece o null",
+                  "altitud": "altitud si aparece o null",
+                  "notas": "notas de cata si aparecen o null",
+                  "sca": "puntuación SCA del café (número del 0 al 100) si aparece en la etiqueta o null"
+                }`
               }
             ]
           }

@@ -14,10 +14,12 @@ export const tastingService = {
         cafes_master (
           id,
           nombre,
+          marca,
           origen,
           finca,
           proceso,
           tueste,
+          sca,
           imagen_url
         )
       `)
@@ -30,7 +32,6 @@ export const tastingService = {
 
   // Crea o encuentra el café en cafes_master y luego crea la cata
   async createTasting(userId, cafeData, tastingData) {
-    // Primero busca si el café ya existe por nombre
     let cafeId = null
 
     if (cafeData.nombre) {
@@ -38,20 +39,23 @@ export const tastingService = {
         .from('cafes_master')
         .select('id')
         .ilike('nombre', cafeData.nombre)
-        .single()
+        .limit(1)
+        .maybeSingle()
 
       if (existing) {
         cafeId = existing.id
       } else {
-        // Si no existe lo crea
+        // Si no existe lo crea con todos los datos incluyendo sca
         const { data: newCafe, error: cafeError } = await supabase
           .from('cafes_master')
           .insert({
             nombre: cafeData.nombre,
+            marca: cafeData.marca || null,
             origen: cafeData.origen || null,
             finca: cafeData.finca || null,
             proceso: cafeData.proceso || null,
             tueste: cafeData.tueste || null,
+            sca: cafeData.sca ? Number(cafeData.sca) : null,
           })
           .select()
           .single()
@@ -61,7 +65,7 @@ export const tastingService = {
       }
     }
 
-    // Crea la cata
+    // Crea la cata — sca va en cafes_master, no aquí
     const { data, error } = await supabase
       .from('tastings')
       .insert({
@@ -71,16 +75,20 @@ export const tastingService = {
         notas: tastingData.notas || null,
         radar_data: tastingData.radarData || {},
         fecha: tastingData.fecha || new Date().toISOString().split('T')[0],
+        precio: tastingData.precio || null,
+        foto_url: tastingData.fotoUrl || null,
       })
       .select(`
         *,
         cafes_master (
           id,
           nombre,
+          marca,
           origen,
           finca,
           proceso,
-          tueste
+          tueste,
+          sca
         )
       `)
       .single()

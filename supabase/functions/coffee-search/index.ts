@@ -45,10 +45,10 @@ serve(async (req) => {
     }))
 
     // Si no hay resultados de shopping, busca resultados orgánicos
-    const organicResults = (serpData.organic_results || []).slice(0, 3).map((r: any) => ({
-      title: r.title,
-      snippet: r.snippet,
-      link: r.link,
+    const organicResults = (serpData.organic_results || []).slice(0, 2).map((r: any) => ({
+    title: r.title,
+    snippet: r.snippet?.slice(0, 200), // limita el snippet
+    link: r.link,
     }))
 
     // 2. Usa Groq para procesar y resumir los resultados
@@ -59,7 +59,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         max_tokens: 500,
         messages: [
           {

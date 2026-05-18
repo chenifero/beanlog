@@ -401,3 +401,29 @@
     max-height: 85vh;
   }
 }
+
+.tasting-search-result {
+  position: relative;
+}
+
+.tasting-search-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.4);
+  color: white;
+  border: none;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-base);
+}
+
+.tasting-search-close:hover {
+  background: rgba(0,0,0,0.7);
+}

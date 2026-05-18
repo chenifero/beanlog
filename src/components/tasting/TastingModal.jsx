@@ -4,187 +4,217 @@
 // -Radar chart sensorial
 // -Guardar
 
-import { useState, useRef } from 'react'
-import { useAuth } from '@/context/AuthContext'
-import { ocrService } from '@/services/ocrService'
-import { tastingService } from '@/services/tastingService'
-import { coffeeSearchService } from '@/services/coffeeSearchService'
+import { useState, useRef } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { ocrService } from "@/services/ocrService";
+import { tastingService } from "@/services/tastingService";
+import { coffeeSearchService } from "@/services/coffeeSearchService";
 import {
-  RadarChart, PolarGrid, PolarAngleAxis, Radar,
-  ResponsiveContainer
-} from 'recharts'
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  ResponsiveContainer,
+} from "recharts";
 import { FaCamera } from "react-icons/fa";
 import { FaEarthAfrica } from "react-icons/fa6";
 import { FaGear } from "react-icons/fa6";
 import { FaFire } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
-import './TastingModal.css'
+import "./TastingModal.css";
 
 const RADAR_ATTRIBUTES = [
-  { key: 'acidez', label: 'Acidez' },
-  { key: 'cuerpo', label: 'Cuerpo' },
-  { key: 'dulzor', label: 'Dulzor' },
-  { key: 'amargor', label: 'Amargor' },
-  { key: 'aroma', label: 'Aroma' },
-  { key: 'frutado', label: 'Frutado' },
-]
+  { key: "acidez", label: "Acidez" },
+  { key: "cuerpo", label: "Cuerpo" },
+  { key: "dulzor", label: "Dulzor" },
+  { key: "amargor", label: "Amargor" },
+  { key: "aroma", label: "Aroma" },
+  { key: "frutado", label: "Frutado" },
+];
 
 const DEFAULT_RADAR = {
-  acidez: 5, cuerpo: 5, dulzor: 5,
-  amargor: 5, aroma: 5, frutado: 5
-}
+  acidez: 5,
+  cuerpo: 5,
+  dulzor: 5,
+  amargor: 5,
+  aroma: 5,
+  frutado: 5,
+};
 
-const STEPS = ['foto', 'datos', 'radar', 'resumen']
+const STEPS = ["foto", "datos", "radar", "resumen"];
 
 export default function TastingModal({ onClose, onTastingCreated }) {
-  const { user } = useAuth()
-  const fileInputRef = useRef(null)
+  const { user } = useAuth();
+  const fileInputRef = useRef(null);
 
-  const [step, setStep] = useState('foto')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [step, setStep] = useState("foto");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [precio, setPrecio] = useState("");
 
   // Foto
-  const [labelFile, setLabelFile] = useState(null)
-  const [labelPreview, setLabelPreview] = useState(null)
+  const [labelFile, setLabelFile] = useState(null);
+  const [labelPreview, setLabelPreview] = useState(null);
 
   // Datos del café — prellenados por OCR
   const [cafeData, setCafeData] = useState({
-    nombre: '', origen: '', finca: '',
-    proceso: '', tueste: '', variedad: '',
-  })
+    marca: "",
+    nombre: "",
+    origen: "",
+    finca: "",
+    proceso: "",
+    tueste: "",
+    variedad: "",
+    sca: "",
+  });
 
   // Datos de la cata
-  const [puntuacion, setPuntuacion] = useState(7)
-  const [notas, setNotas] = useState('')
-  const [radarData, setRadarData] = useState(DEFAULT_RADAR)
-  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
+  const [puntuacion, setPuntuacion] = useState(7);
+  const [notas, setNotas] = useState("");
+  const [radarData, setRadarData] = useState(DEFAULT_RADAR);
+  const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
 
   // Búsqueda de compra
-  const [searchResult, setSearchResult] = useState(null)
-  const [searching, setSearching] = useState(false)
+  const [searchResult, setSearchResult] = useState(null);
+  const [searching, setSearching] = useState(false);
 
   // Selecciona la foto y genera preview
   const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    setLabelFile(file)
-    setLabelPreview(URL.createObjectURL(file))
-    setError('')
-  }
+    const file = e.target.files[0];
+    if (!file) return;
+    setLabelFile(file);
+    setLabelPreview(URL.createObjectURL(file));
+    setError("");
+  };
 
   // Envía la foto al OCR y pasa al paso de datos
   const handleScanLabel = async () => {
     if (!labelFile) {
-      setError('Selecciona una foto de la etiqueta')
-      return
+      setError("Selecciona una foto de la etiqueta");
+      return;
     }
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
     try {
-      const result = await ocrService.scanLabel(labelFile) // Rellena los campos con los datos extraídos por la IA
-      console.log('OCR result:', result)
+      const result = await ocrService.scanLabel(labelFile); // Rellena los campos con los datos extraídos por la IA
+      console.log("OCR result:", result);
+      // En el setCafeData del handleScanLabel
       setCafeData({
-      nombre: result.nombre !== 'null' ? result.nombre || '' : '',
-      origen: result.origen !== 'null' ? result.origen || '' : '',
-      finca: result.finca !== 'null' ? result.finca || '' : '',
-      proceso: result.proceso !== 'null' ? result.proceso || '' : '',
-      tueste: result.tueste !== 'null' ? result.tueste || '' : '',
-      variedad: result.variedad !== 'null' ? result.variedad || '' : '',
-      })
-      setStep('datos')
+        marca: result.marca !== "null" ? result.marca || "" : "",
+        nombre: result.nombre !== "null" ? result.nombre || "" : "",
+        origen: result.origen !== "null" ? result.origen || "" : "",
+        finca: result.finca !== "null" ? result.finca || "" : "",
+        proceso: result.proceso !== "null" ? result.proceso || "" : "",
+        tueste: result.tueste !== "null" ? result.tueste || "" : "",
+        variedad: result.variedad !== "null" ? result.variedad || "" : "",
+        sca: result.sca !== "null" ? result.sca || "" : "",
+      });
+      setStep("datos");
     } catch (err) {
-      console.error('Error OCR:', err)
-      setError('Error al escanear la etiqueta. Puedes rellenar los datos manualmente.')
-      setStep('datos')
+      console.error("Error OCR:", err);
+      setError(
+        "Error al escanear la etiqueta. Puedes rellenar los datos manualmente.",
+      );
+      setStep("datos");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Busca información de compra del café
   const handleSearchCoffee = async () => {
-    if (!cafeData.nombre) return
-    setSearching(true)
+    if (!cafeData.nombre) return;
+    setSearching(true);
     try {
       const result = await coffeeSearchService.searchCoffee(
-        `${cafeData.nombre} ${cafeData.origen || ''}`
-      )
-      setSearchResult(result)
+        `${cafeData.nombre} ${cafeData.origen || ""}`,
+      );
+      setSearchResult(result);
+      if (result?.bestPrice) setPrecio(result.bestPrice);
     } catch (err) {
-      console.error('Error buscando café:', err)
+      console.error("Error buscando café:", err);
     } finally {
-      setSearching(false)
+      setSearching(false);
     }
-  }
+  };
 
   // Actualiza un valor del radar
   const handleRadarChange = (key, value) => {
-    setRadarData(prev => ({ ...prev, [key]: Number(value) }))
-  }
+    setRadarData((prev) => ({ ...prev, [key]: Number(value) }));
+  };
 
   // Guarda la cata completa
   const handleSave = async () => {
     if (!cafeData.nombre) {
-      setError('El nombre del café es obligatorio')
-      return
+      setError("El nombre del café es obligatorio");
+      return;
     }
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
     try {
-      const tasting = await tastingService.createTasting(
-        user.id,
-        cafeData,
-        { puntuacion, notas, radarData, fecha }
-      )
-      onTastingCreated?.(tasting)
-      onClose()
+      let fotoUrl = null;
+      if (labelFile) {
+        fotoUrl = await tastingService.uploadLabelPhoto(user.id, labelFile);
+      }
+
+      const tasting = await tastingService.createTasting(user.id, cafeData, {
+        puntuacion,
+        notas,
+        radarData,
+        fecha,
+        precio,
+        fotoUrl,
+      });
+      onTastingCreated?.(tasting);
+      onClose();
     } catch (err) {
-      setError('Error al guardar la cata')
-      console.error(err)
+      setError("Error al guardar la cata");
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Datos para el radar chart de Recharts
-  const radarChartData = RADAR_ATTRIBUTES.map(attr => ({
+  const radarChartData = RADAR_ATTRIBUTES.map((attr) => ({
     attribute: attr.label,
     value: radarData[attr.key],
-  }))
+  }));
 
-  const stepIndex = STEPS.indexOf(step)
+  const stepIndex = STEPS.indexOf(step);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="tasting-modal" onClick={e => e.stopPropagation()}>
-
+      <div className="tasting-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="tasting-modal-header">
           <div className="tasting-steps">
             {STEPS.map((s, i) => (
               <div
                 key={s}
-                className={`tasting-step ${i <= stepIndex ? 'active' : ''}`}
+                className={`tasting-step ${i <= stepIndex ? "active" : ""}`}
               />
             ))}
           </div>
           <h3 className="tasting-modal-title">
-            {step === 'foto' && 'Escanear etiqueta'}
-            {step === 'datos' && 'Datos del café'}
-            {step === 'radar' && 'Perfil sensorial'}
-            {step === 'resumen' && 'Resumen'}
+            {step === "foto" && "Escanear etiqueta"}
+            {step === "datos" && "Datos del café"}
+            {step === "radar" && "Perfil sensorial"}
+            {step === "resumen" && "Resumen"}
           </h3>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}>
+            ✕
+          </button>
         </div>
 
         <div className="tasting-modal-body">
-
           {/* ── PASO 1: FOTO ── */}
-          {step === 'foto' && (
+          {step === "foto" && (
             <div className="tasting-step-content">
               <p className="tasting-step-desc">
-                Haz una foto a la etiqueta del café y la IA extraerá los datos automáticamente.
+                Haz una foto a la etiqueta del café y la IA extraerá los datos
+                automáticamente.
               </p>
 
               <input
@@ -192,7 +222,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                 ref={fileInputRef}
                 accept="image/*"
                 capture="environment"
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 onChange={handleFileChange}
               />
 
@@ -202,9 +232,13 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   className="tasting-upload-zone"
                   onClick={() => fileInputRef.current.click()}
                 >
-                  <span className="tasting-upload-icon"><FaCamera /></span>
+                  <span className="tasting-upload-icon">
+                    <FaCamera />
+                  </span>
                   <p>Toca para hacer una foto</p>
-                  <p className="tasting-upload-sub">o selecciona de tu galería</p>
+                  <p className="tasting-upload-sub">
+                    o selecciona de tu galería
+                  </p>
                 </div>
               ) : (
                 <div className="tasting-label-preview">
@@ -221,7 +255,10 @@ export default function TastingModal({ onClose, onTastingCreated }) {
               {error && <p className="tasting-error">{error}</p>}
 
               <div className="tasting-modal-footer">
-                <button className="tasting-btn-secondary" onClick={() => setStep('datos')}>
+                <button
+                  className="tasting-btn-secondary"
+                  onClick={() => setStep("datos")}
+                >
                   Rellenar manualmente
                 </button>
                 <button
@@ -229,14 +266,14 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   onClick={handleScanLabel}
                   disabled={!labelFile || loading}
                 >
-                  {loading ? 'Escaneando...' : 'Escanear IA ✨'}
+                  {loading ? "Escaneando..." : "Escanear IA ✨"}
                 </button>
               </div>
             </div>
           )}
 
           {/* ── PASO 2: DATOS ── */}
-          {step === 'datos' && (
+          {step === "datos" && (
             <div className="tasting-step-content">
               <p className="tasting-step-desc">
                 Revisa y completa los datos extraídos por la IA.
@@ -244,11 +281,24 @@ export default function TastingModal({ onClose, onTastingCreated }) {
 
               <div className="tasting-fields">
                 <div className="tasting-field">
+                  <label>Marca / Tostadora</label>
+                  <input
+                    type="text"
+                    value={cafeData.marca}
+                    onChange={(e) =>
+                      setCafeData((p) => ({ ...p, marca: e.target.value }))
+                    }
+                    placeholder="Ej: Nomad Coffee"
+                  />
+                </div>
+                <div className="tasting-field">
                   <label>Nombre del café *</label>
                   <input
                     type="text"
                     value={cafeData.nombre}
-                    onChange={e => setCafeData(p => ({ ...p, nombre: e.target.value }))}
+                    onChange={(e) =>
+                      setCafeData((p) => ({ ...p, nombre: e.target.value }))
+                    }
                     placeholder="Ej: Yirgacheffe Natural"
                   />
                 </div>
@@ -257,7 +307,9 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   <input
                     type="text"
                     value={cafeData.origen}
-                    onChange={e => setCafeData(p => ({ ...p, origen: e.target.value }))}
+                    onChange={(e) =>
+                      setCafeData((p) => ({ ...p, origen: e.target.value }))
+                    }
                     placeholder="Ej: Etiopía"
                   />
                 </div>
@@ -267,7 +319,9 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                     <input
                       type="text"
                       value={cafeData.proceso}
-                      onChange={e => setCafeData(p => ({ ...p, proceso: e.target.value }))}
+                      onChange={(e) =>
+                        setCafeData((p) => ({ ...p, proceso: e.target.value }))
+                      }
                       placeholder="Ej: Natural"
                     />
                   </div>
@@ -276,7 +330,9 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                     <input
                       type="text"
                       value={cafeData.tueste}
-                      onChange={e => setCafeData(p => ({ ...p, tueste: e.target.value }))}
+                      onChange={(e) =>
+                        setCafeData((p) => ({ ...p, tueste: e.target.value }))
+                      }
                       placeholder="Ej: Claro"
                     />
                   </div>
@@ -286,8 +342,24 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   <input
                     type="text"
                     value={cafeData.finca}
-                    onChange={e => setCafeData(p => ({ ...p, finca: e.target.value }))}
+                    onChange={(e) =>
+                      setCafeData((p) => ({ ...p, finca: e.target.value }))
+                    }
                     placeholder="Ej: Konga"
+                  />
+                </div>
+
+                <div className="tasting-field">
+                  <label>Puntuación SCA</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={cafeData.sca}
+                    onChange={(e) =>
+                      setCafeData((p) => ({ ...p, sca: e.target.value }))
+                    }
+                    placeholder="Ej: 87"
                   />
                 </div>
 
@@ -298,37 +370,80 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                     onClick={handleSearchCoffee}
                     disabled={!cafeData.nombre || searching}
                   >
-                   {searching ? 'Buscando...' : <><FaSearch /> Buscar dónde comprar</>}
+                    {searching ? (
+                      "Buscando..."
+                    ) : (
+                      <>
+                        <FaSearch /> Buscar dónde comprar
+                      </>
+                    )}
                   </button>
 
                   {searchResult?.found && (
                     <div className="tasting-search-result">
+                      {/* Botón X para cerrar el resultado */}
+                      <button
+                        className="tasting-search-close"
+                        onClick={() => setSearchResult(null)}
+                      >
+                        ✕
+                      </button>
                       {searchResult.bestImage && (
-                        <img src={searchResult.bestImage} alt="producto" className="tasting-search-img" />
+                        <img
+                          src={searchResult.bestImage}
+                          alt="producto"
+                          className="tasting-search-img"
+                        />
                       )}
                       <div className="tasting-search-info">
-                        <p className="tasting-search-price">{searchResult.bestPrice}</p>
-                        <p className="tasting-search-source">{searchResult.source}</p>
+                        <p className="tasting-search-price">
+                          {searchResult.bestPrice}
+                        </p>
+                        <p className="tasting-search-source">
+                          {searchResult.source}
+                        </p>
                         {searchResult.bestLink && (
-                          <a href={searchResult.bestLink} target="_blank" rel="noreferrer" className="tasting-search-link">
+                          <a
+                            href={searchResult.bestLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="tasting-search-link"
+                          >
                             Ver producto →
                           </a>
                         )}
                       </div>
                     </div>
                   )}
+
+                  {/* Campo de precio — se rellena automáticamente o manualmente */}
+                  <div
+                    className="tasting-field"
+                    style={{ marginTop: "var(--spacing-sm)" }}
+                  >
+                    <label>Precio</label>
+                    <input
+                      type="text"
+                      value={precio}
+                      onChange={(e) => setPrecio(e.target.value)}
+                      placeholder="Ej: 14,00 €"
+                    />
+                  </div>
                 </div>
               </div>
 
               {error && <p className="tasting-error">{error}</p>}
 
               <div className="tasting-modal-footer">
-                <button className="tasting-btn-secondary" onClick={() => setStep('foto')}>
+                <button
+                  className="tasting-btn-secondary"
+                  onClick={() => setStep("foto")}
+                >
                   ← Atrás
                 </button>
                 <button
                   className="tasting-btn-primary"
-                  onClick={() => setStep('radar')}
+                  onClick={() => setStep("radar")}
                   disabled={!cafeData.nombre}
                 >
                   Siguiente →
@@ -338,7 +453,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
           )}
 
           {/* ── PASO 3: RADAR ── */}
-          {step === 'radar' && (
+          {step === "radar" && (
             <div className="tasting-step-content">
               <p className="tasting-step-desc">
                 Define el perfil sensorial moviendo los sliders.
@@ -347,11 +462,21 @@ export default function TastingModal({ onClose, onTastingCreated }) {
               {/* Radar chart en tiempo real */}
               <div className="tasting-radar-chart">
                 <ResponsiveContainer width="100%" height={220}>
-                  <RadarChart data={radarChartData}>
+                  <RadarChart
+                    data={radarChartData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius="70%"
+                  >
                     <PolarGrid stroke="var(--border)" />
                     <PolarAngleAxis
                       dataKey="attribute"
-                      tick={{ fill: 'var(--text-dim)', fontSize: 11 }}
+                      tick={{ fill: "var(--text-dim)", fontSize: 9 }}
+                    />
+                    <PolarRadiusAxis
+                      domain={[0, 10]}
+                      tick={false}
+                      axisLine={false}
                     />
                     <Radar
                       dataKey="value"
@@ -365,26 +490,37 @@ export default function TastingModal({ onClose, onTastingCreated }) {
 
               {/* Sliders para cada atributo */}
               <div className="tasting-sliders">
-                {RADAR_ATTRIBUTES.map(attr => (
+                {RADAR_ATTRIBUTES.map((attr) => (
                   <div key={attr.key} className="tasting-slider-row">
                     <span className="tasting-slider-label">{attr.label}</span>
                     <input
                       type="range"
-                      min={1} max={10}
+                      min={1}
+                      max={10}
                       value={radarData[attr.key]}
-                      onChange={e => handleRadarChange(attr.key, e.target.value)}
+                      onChange={(e) =>
+                        handleRadarChange(attr.key, e.target.value)
+                      }
                       className="tasting-slider"
                     />
-                    <span className="tasting-slider-value">{radarData[attr.key]}</span>
+                    <span className="tasting-slider-value">
+                      {radarData[attr.key]}
+                    </span>
                   </div>
                 ))}
               </div>
 
               <div className="tasting-modal-footer">
-                <button className="tasting-btn-secondary" onClick={() => setStep('datos')}>
+                <button
+                  className="tasting-btn-secondary"
+                  onClick={() => setStep("datos")}
+                >
                   ← Atrás
                 </button>
-                <button className="tasting-btn-primary" onClick={() => setStep('resumen')}>
+                <button
+                  className="tasting-btn-primary"
+                  onClick={() => setStep("resumen")}
+                >
                   Siguiente →
                 </button>
               </div>
@@ -392,15 +528,26 @@ export default function TastingModal({ onClose, onTastingCreated }) {
           )}
 
           {/* ── PASO 4: RESUMEN ── */}
-          {step === 'resumen' && (
+          {step === "resumen" && (
             <div className="tasting-step-content">
               <div className="tasting-summary">
-
                 <div className="tasting-summary-cafe">
                   <h4>{cafeData.nombre}</h4>
-                  {cafeData.origen && <p><FaEarthAfrica /> {cafeData.origen}</p>}
-                  {cafeData.proceso && <p><FaGear /> {cafeData.proceso}</p>}
-                  {cafeData.tueste && <p><FaFire /> {cafeData.tueste}</p>}
+                  {cafeData.origen && (
+                    <p>
+                      <FaEarthAfrica /> {cafeData.origen}
+                    </p>
+                  )}
+                  {cafeData.proceso && (
+                    <p>
+                      <FaGear /> {cafeData.proceso}
+                    </p>
+                  )}
+                  {cafeData.tueste && (
+                    <p>
+                      <FaFire /> {cafeData.tueste}
+                    </p>
+                  )}
                 </div>
 
                 {/* Puntuación */}
@@ -409,9 +556,11 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   <div className="tasting-score-row">
                     <input
                       type="range"
-                      min={1} max={10} step={0.5}
+                      min={1}
+                      max={10}
+                      step={0.5}
                       value={puntuacion}
-                      onChange={e => setPuntuacion(Number(e.target.value))}
+                      onChange={(e) => setPuntuacion(Number(e.target.value))}
                       className="tasting-slider"
                     />
                     <span className="tasting-score-value">{puntuacion}/10</span>
@@ -423,7 +572,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   <label>Notas de cata</label>
                   <textarea
                     value={notas}
-                    onChange={e => setNotas(e.target.value)}
+                    onChange={(e) => setNotas(e.target.value)}
                     placeholder="¿Qué sabores y aromas percibes?"
                     rows={3}
                     className="tasting-textarea"
@@ -436,17 +585,19 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   <input
                     type="date"
                     value={fecha}
-                    onChange={e => setFecha(e.target.value)}
+                    onChange={(e) => setFecha(e.target.value)}
                     className="tasting-date"
                   />
                 </div>
-
               </div>
 
               {error && <p className="tasting-error">{error}</p>}
 
               <div className="tasting-modal-footer">
-                <button className="tasting-btn-secondary" onClick={() => setStep('radar')}>
+                <button
+                  className="tasting-btn-secondary"
+                  onClick={() => setStep("radar")}
+                >
                   ← Atrás
                 </button>
                 <button
@@ -454,14 +605,13 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   onClick={handleSave}
                   disabled={loading}
                 >
-                  {loading ? 'Guardando...' : '✅ Guardar cata'}
+                  {loading ? "Guardando..." : "✅ Guardar cata"}
                 </button>
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>
-  )
+  );
 }
