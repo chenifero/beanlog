@@ -1,0 +1,256 @@
+/* Página del mapa — ocupa toda la pantalla disponible */
+.mapa-page {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 0px);
+  overflow: hidden;
+}
+
+/* El mapa ocupa todo el espacio */
+.mapa-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Botón flotante para añadir cafetería */
+.mapa-add-btn {
+  position: absolute;
+  top: var(--spacing-lg);
+  left: var(--spacing-lg);
+  background: var(--amber);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all var(--transition-base);
+}
+
+.mapa-add-btn:hover {
+  background: var(--amber-soft);
+  transform: translateY(-1px);
+}
+
+/* Modal de nueva cafetería */
+.mapa-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.mapa-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.mapa-modal-header h3 {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--cream);
+  margin: 0;
+}
+
+.mapa-modal-body {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.mapa-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  gap: var(--spacing-md);
+}
+
+/* Campos del formulario */
+.mapa-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.mapa-field label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--cream);
+}
+
+.mapa-field input,
+.mapa-field textarea {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color var(--transition-base);
+}
+
+.mapa-field input:focus,
+.mapa-field textarea:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-subtle);
+}
+
+.mapa-field textarea {
+  resize: none;
+}
+
+/* Autocomplete de ubicación */
+.mapa-location-wrapper {
+  position: relative;
+}
+
+.mapa-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-top: 4px;
+  list-style: none;
+  padding: var(--spacing-xs) 0;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.mapa-suggestions li {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--transition-base);
+}
+
+.mapa-suggestions li:hover {
+  background: var(--amber-subtle);
+  color: var(--amber);
+}
+
+.mapa-error {
+  font-size: 0.85rem;
+  color: #ef4444;
+  margin: 0;
+}
+
+/* Panel de detalle de cafetería */
+.mapa-detail {
+  position: absolute;
+  bottom: var(--spacing-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: var(--spacing-lg);
+  min-width: 280px;
+  max-width: 360px;
+  z-index: 10;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.mapa-detail-close {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-base);
+}
+
+.mapa-detail-close:hover {
+  color: var(--text);
+}
+
+.mapa-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.mapa-detail-name {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--cream);
+  margin: 0;
+}
+
+.mapa-detail-score {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.mapa-detail-location {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.mapa-detail-notes {
+  font-size: 0.875rem;
+  color: var(--text);
+  margin: 0 0 var(--spacing-md);
+  line-height: 1.5;
+}
+
+.mapa-detail-maps-btn {
+  background: var(--amber);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  width: 100%;
+}
+
+.mapa-detail-maps-btn:hover {
+  background: var(--amber-soft);
+}
+
+@media (max-width: 767px) {
+  .mapa-add-btn {
+    top: auto;
+    bottom: 80px;
+    left: var(--spacing-md);
+  }
+
+  .mapa-detail {
+    bottom: 140px;
+    left: var(--spacing-md);
+    right: var(--spacing-md);
+    transform: none;
+    max-width: 100%;
+  }
+}

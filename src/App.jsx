@@ -14,6 +14,7 @@ import { SidebarProvider } from '@/context/SidebarContext'
 import ProfilePages from '@/pages/ProfilePages'
 import MisCafesPage from '@/pages/MisCafesPage'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import MapaPage from '@/pages/MapaPage'
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()
@@ -46,6 +47,7 @@ function AppRoutes() {
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/profile" element={<ProfilePages />} />
                 <Route path="/cafes" element={<MisCafesPage />} />
+                <Route path="/map" element={<MapaPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </AppShell>
