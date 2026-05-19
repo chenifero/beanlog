@@ -4,7 +4,6 @@
   border-radius: 14px;
   overflow: hidden;
   transition: border-color var(--transition-base);
-  min-width: 320px;
 }
 
 .tasting-card:hover {

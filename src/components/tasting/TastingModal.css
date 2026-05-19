@@ -146,7 +146,26 @@
 .tasting-field {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
+}
+
+.tasting-field select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color var(--transition-base);
+  width: 100%;
+  cursor: pointer;
+}
+
+.tasting-field select:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-subtle);
 }
 
 .tasting-field label {
@@ -155,7 +174,7 @@
   color: var(--cream);
 }
 
-.tasting-field input,
+.tasting-field input:not([type="range"]),
 .tasting-textarea,
 .tasting-date {
   padding: var(--spacing-sm) var(--spacing-md);
@@ -311,6 +330,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
 }
 
 .tasting-summary-cafe h4 {
@@ -363,6 +383,14 @@
   transition: all var(--transition-base);
 }
 
+.tasting-btn-primary svg {
+  transform: translateY(3px);
+}
+
+.tasting-btn-secondary svg {
+  transform: translateY(3px);
+}
+
 .tasting-btn-primary:hover:not(:disabled) {
   background: var(--amber-soft);
 }
@@ -383,6 +411,7 @@
   cursor: pointer;
   transition: all var(--transition-base);
 }
+
 
 .tasting-btn-secondary:hover {
   background: var(--surface2);

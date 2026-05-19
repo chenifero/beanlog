@@ -7,6 +7,7 @@ import '@/styles/reset.css'
 import '@/styles/global.css'
 import '@/styles/typography.css'
 import '@/styles/animations.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js')

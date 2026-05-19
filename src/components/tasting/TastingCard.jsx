@@ -16,6 +16,7 @@ import { FaEarthAfrica } from "react-icons/fa6";
 import { FaGear } from "react-icons/fa6";
 import { FaFire } from "react-icons/fa6";
 
+
 export default function TastingCard({ tasting, onDelete }) {
   const { user } = useAuth();
   const [expanded, setExpanded] = useState(false);
@@ -91,7 +92,7 @@ export default function TastingCard({ tasting, onDelete }) {
           {/* Radar chart */}
           {Object.keys(radarData).length > 0 && (
             <div className="tasting-card-radar">
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={220} minWidth={280}>
                 <RadarChart
                   data={radarChartData}
                   cx="50%"

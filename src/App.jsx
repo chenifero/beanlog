@@ -13,6 +13,7 @@ import SettingsPage from '@/pages/SettingsPage'
 import { SidebarProvider } from '@/context/SidebarContext'
 import ProfilePages from '@/pages/ProfilePages'
 import MisCafesPage from '@/pages/MisCafesPage'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()

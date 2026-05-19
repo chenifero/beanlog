@@ -22,6 +22,10 @@ import { FaEarthAfrica } from "react-icons/fa6";
 import { FaGear } from "react-icons/fa6";
 import { FaFire } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
+import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
+import { ORIGENES, PROCESOS, TUESTES } from "@/utils/coffeeConstants";
 import "./TastingModal.css";
 
 const RADAR_ATTRIBUTES = [
@@ -304,37 +308,52 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                 </div>
                 <div className="tasting-field">
                   <label>Origen</label>
-                  <input
-                    type="text"
+                  <select
                     value={cafeData.origen}
                     onChange={(e) =>
                       setCafeData((p) => ({ ...p, origen: e.target.value }))
                     }
-                    placeholder="Ej: Etiopía"
-                  />
+                  >
+                    <option value="">Seleccionar origen</option>
+                    {ORIGENES.map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="tasting-fields-row">
                   <div className="tasting-field">
                     <label>Proceso</label>
-                    <input
-                      type="text"
+                    <select
                       value={cafeData.proceso}
                       onChange={(e) =>
                         setCafeData((p) => ({ ...p, proceso: e.target.value }))
                       }
-                      placeholder="Ej: Natural"
-                    />
+                    >
+                      <option value="">Seleccionar proceso</option>
+                      {PROCESOS.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="tasting-field">
                     <label>Tueste</label>
-                    <input
-                      type="text"
+                    <select
                       value={cafeData.tueste}
                       onChange={(e) =>
                         setCafeData((p) => ({ ...p, tueste: e.target.value }))
                       }
-                      placeholder="Ej: Claro"
-                    />
+                    >
+                      <option value="">Seleccionar tueste</option>
+                      {TUESTES.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <div className="tasting-field">
@@ -439,14 +458,14 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   className="tasting-btn-secondary"
                   onClick={() => setStep("foto")}
                 >
-                  ← Atrás
+                  <IoIosArrowBack /> Atrás
                 </button>
                 <button
                   className="tasting-btn-primary"
                   onClick={() => setStep("radar")}
                   disabled={!cafeData.nombre}
                 >
-                  Siguiente →
+                  Siguiente <IoIosArrowForward />
                 </button>
               </div>
             </div>
@@ -515,13 +534,13 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   className="tasting-btn-secondary"
                   onClick={() => setStep("datos")}
                 >
-                  ← Atrás
+                  <IoIosArrowBack /> Atrás
                 </button>
                 <button
                   className="tasting-btn-primary"
                   onClick={() => setStep("resumen")}
                 >
-                  Siguiente →
+                  Siguiente <IoIosArrowForward />
                 </button>
               </div>
             </div>
@@ -598,14 +617,20 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   className="tasting-btn-secondary"
                   onClick={() => setStep("radar")}
                 >
-                  ← Atrás
+                  <IoIosArrowBack /> Atrás
                 </button>
                 <button
                   className="tasting-btn-primary"
                   onClick={handleSave}
                   disabled={loading}
                 >
-                  {loading ? "Guardando..." : "✅ Guardar cata"}
+                  {loading ? (
+                    "Guardando..."
+                  ) : (
+                    <>
+                      <FaCheck /> Guardar cata
+                    </>
+                  )}
                 </button>
               </div>
             </div>
