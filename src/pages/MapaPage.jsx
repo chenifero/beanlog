@@ -11,14 +11,29 @@ import "./MapaPage.css";
 
 // Icono SVG para los marcadores
 const markerIcon = L.divIcon({
-  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" width="40" height="50">
-    <circle cx="20" cy="20" r="18" fill="#c349ee" stroke="white" stroke-width="2"/>
-    <text x="20" y="26" text-anchor="middle" font-size="16">☕</text>
-    <polygon points="20,44 13,32 27,32" fill="#c349ee"/>
-  </svg>`,
+  html: `
+    <div style="
+      width:40px; height:50px;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:flex-start;
+    ">
+      <div style="
+        width:36px; height:36px;
+        background:#c349ee;
+        border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);
+        display:flex; align-items:center; justify-content:center;
+        box-shadow:0 2px 8px rgba(0,0,0,0.3);
+      ">
+        <svg style="transform:rotate(45deg)" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 640 512" fill="white">
+          <path d="M192 384h192c53 0 96-43 96-96h32c70.6 0 128-57.4 128-128S582.6 32 512 32H120c-13.3 0-24 10.7-24 24v232c0 53 43 96 96 96zM512 96c35.3 0 64 28.7 64 64s-28.7 64-64 64h-32V96h32zm47.7 384H48.3c-47.6 0-61-64-36-64h583.4c25 0 11.8 64-36 64z"/>
+        </svg>
+      </div>
+    </div>
+  `,
   className: "",
   iconSize: [40, 50],
-  iconAnchor: [20, 50],
+  iconAnchor: [20, 46],
 });
 
 function FlyTo({ center, zoom }) {
@@ -39,12 +54,42 @@ function LocateUser() {
   return null;
 }
 
+function Carrusel({ fotos }) {
+  const [idx, setIdx] = useState(0);
+  return (
+    <div className="mapa-carrusel">
+      <img src={fotos[idx]} alt={`foto-${idx}`} className="mapa-detail-foto" />
+      {fotos.length > 1 && (
+        <>
+          <button
+            className="mapa-carrusel-btn left"
+            onClick={() => setIdx((i) => (i - 1 + fotos.length) % fotos.length)}
+          >‹</button>
+          <button
+            className="mapa-carrusel-btn right"
+            onClick={() => setIdx((i) => (i + 1) % fotos.length)}
+          >›</button>
+          <div className="mapa-carrusel-dots">
+            {fotos.map((_, i) => (
+              <span key={i} className={`dot${i === idx ? " active" : ""}`} onClick={() => setIdx(i)} />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function MapaPage() {
   const [coffeeShops, setCoffeeShops] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedShop, setSelectedShop] = useState(null);
   const [loading, setLoading] = useState(true);
   const [flyTo, setFlyTo] = useState(null);
+
+  // Foto de la cafetería
+  const [fotoFiles, setFotoFiles] = useState([]);
+  const [fotoPreviews, setFotoPreviews] = useState([]);
 
   // Form de nueva cafetería
   const [formData, setFormData] = useState({
@@ -71,6 +116,14 @@ export default function MapaPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Foto de la cafetería
+  const handleFotoChange = (e) => {
+    const newFiles = Array.from(e.target.files).slice(0, 5 - fotoFiles.length);
+    const newPreviews = newFiles.map((f) => URL.createObjectURL(f));
+    setFotoFiles((prev) => [...prev, ...newFiles].slice(0, 5));
+    setFotoPreviews((prev) => [...prev, ...newPreviews].slice(0, 5));
   };
 
   useEffect(() => {
@@ -141,6 +194,10 @@ export default function MapaPage() {
     setSaving(true);
     setError("");
     try {
+      let foto_urls = [];
+      if (fotoFiles.length > 0) {
+        foto_urls = await coffeeShopService.uploadFotos(fotoFiles);
+      }
       const shop = await coffeeShopService.createCoffeeShop({
         nombre: formData.nombre,
         lat: formData.lat,
@@ -149,9 +206,12 @@ export default function MapaPage() {
         notas: formData.notas || null,
         ciudad: formData.ciudad,
         pais: formData.pais,
+        foto_urls: foto_urls || null,
       });
       setCoffeeShops((prev) => [...prev, shop]);
       setShowModal(false);
+      setFotoFiles([]);
+      setFotoPreviews([]);
       setFormData({
         nombre: "",
         valoracion: "",
@@ -170,6 +230,11 @@ export default function MapaPage() {
     }
   };
 
+  const handleRemoveFoto = (index) => {
+    setFotoFiles((prev) => prev.filter((_, i) => i !== index));
+    setFotoPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
   // Abre Google Maps o Apple Maps
   const openInMaps = (shop) => {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -180,7 +245,7 @@ export default function MapaPage() {
   };
 
   return (
-    <div className="mapa-page">
+    <div className={`mapa-page${showModal ? " modal-open" : ""}`}>
       {/* Mapa */}
       <MapContainer
         center={[40.4168, -3.7038]}
@@ -232,6 +297,35 @@ export default function MapaPage() {
                     setFormData((p) => ({ ...p, nombre: e.target.value }))
                   }
                 />
+              </div>
+
+              <div className="mapa-field">
+                <label>
+                  Fotos {fotoFiles.length > 0 ? `(${fotoFiles.length}/5)` : ""}
+                </label>
+                {fotoFiles.length < 5 && (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFotoChange}
+                  />
+                )}
+                {fotoPreviews.length > 0 && (
+                  <div className="mapa-fotos-preview">
+                    {fotoPreviews.map((src, i) => (
+                      <div key={i} className="mapa-foto-thumb">
+                        <img src={src} alt={`foto-${i}`} />
+                        <button
+                          className="mapa-foto-remove"
+                          onClick={() => handleRemoveFoto(i)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="mapa-field">
@@ -319,6 +413,12 @@ export default function MapaPage() {
           >
             ✕
           </button>
+          {selectedShop.foto_urls?.length > 0 ? (
+            <Carrusel fotos={selectedShop.foto_urls} />
+          ) : (
+            <div className="mapa-detail-foto-placeholder">☕</div>
+          )}
+
           <div className="mapa-detail-header">
             <h3 className="mapa-detail-name">{selectedShop.nombre}</h3>
             {selectedShop.valoracion && (
