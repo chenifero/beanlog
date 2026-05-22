@@ -14,7 +14,6 @@ export default function BottomNav() {
     { path: '/', label: 'Home', icon: <FaCoffee /> },
     { path: '/cafes', label: 'Cafés', icon: <PiCoffeeBeanFill /> },
     { path: '/map', label: 'Mapa', icon: <FaMap /> },
-    { path: '/stats', label: 'Stats', icon: <IoStatsChart /> },
     { path: '/profile', label: 'Perfil', icon: <FaUser /> },
   ]
 

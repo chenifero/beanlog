@@ -19,7 +19,6 @@ export default function Sidebar() {
     { path: '/', label: 'Home', icon: <FaCoffee /> },
     { path: '/cafes', label: 'Mis Cafés', icon: <PiCoffeeBeanFill /> },
     { path: '/map', label: 'Mapa', icon: <FaMap /> },
-    { path: '/stats', label: 'Estadísticas', icon: <IoStatsChart /> },
     { path: '/settings', label: 'Ajustes', icon: <IoSettings /> },
   ]
 

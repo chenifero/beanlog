@@ -388,6 +388,10 @@
   background: rgba(239, 68, 68, 0.1);
 }
 
+.settings-back-btn {
+  display: none;
+}
+
 /* Mobile — todo en columna */
 @media (max-width: 767px) {
   .settings-page {
@@ -426,6 +430,20 @@
 
   .settings-content {
     padding: var(--spacing-lg);
+  }
+
+   .settings-back-btn {
+    display: flex;
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    z-index: 100;
   }
 
 }
