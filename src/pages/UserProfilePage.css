@@ -1,0 +1,95 @@
+.uprofile-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  position: relative;
+}
+
+.uprofile-close {
+  position: fixed;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: color var(--transition-base);
+}
+
+.uprofile-close:hover {
+  color: var(--text);
+}
+
+.uprofile-header {
+  text-align: center;
+  padding: var(--spacing-xl) 0 var(--spacing-lg);
+}
+
+.uprofile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--amber-subtle);
+  color: var(--amber);
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--spacing-md);
+  overflow: hidden;
+}
+
+.uprofile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uprofile-username {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  color: var(--cream);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.uprofile-bio {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin: 0 0 var(--spacing-sm);
+  line-height: 1.5;
+}
+
+.uprofile-location {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.uprofile-posts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+}
+
+.uprofile-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: var(--spacing-xl);
+}
+
+.uprofile-loading {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--muted);
+}

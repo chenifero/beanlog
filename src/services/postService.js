@@ -43,6 +43,22 @@ export const postService = {
   return data
 },
 
+// Obtiene las publicaciones de un usuario específico por su ID
+async getPostsByUserId(userId) {
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      *,
+      profiles (username, avatar_url, experience_level),
+      tastings (puntuacion, cafes_master (nombre, origen)),
+      coffee_shops (nombre)
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+},
+
   // Obtiene solo las publicaciones de los usuarios que sigue el usuario actual
   async getFollowingFeed(userId, limit = 20, offset = 0) {
     const { data, error } = await supabase

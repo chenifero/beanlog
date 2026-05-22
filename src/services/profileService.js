@@ -29,6 +29,17 @@ export const profileService = {
     return data
   },
 
+  //Obtiene perfil por username para mostrar perfiles públicos
+  async getProfileByUsername(username) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('username', username)
+    .single()
+  if (error) throw error
+  return data
+},
+
   // Sube una foto de perfil al storage de Supabase y devuelve la URL pública
   async uploadAvatar(userId, file) {
     const fileExt = file.name.split('.').pop()
