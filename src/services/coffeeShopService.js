@@ -27,6 +27,7 @@ export const coffeeShopService = {
         notas: notas || null,
         ciudad: ciudad || null,
         pais: pais || null,
+        foto_url: foto_url || null,
       })
       .select()
       .single()
@@ -43,5 +44,20 @@ export const coffeeShopService = {
       .eq('id', id)
 
     if (error) throw error
-  }
+  },
+
+  async uploadFoto(file) {
+  const ext = file.name.split('.').pop();
+  const path = `${Date.now()}.${ext}`;
+  const { error } = await supabase.storage
+    .from('coffee-shops')
+    .upload(path, file);
+  if (error) throw error;
+  const { data } = supabase.storage.from('coffee-shops').getPublicUrl(path);
+  return data.publicUrl;
+},
+
+
+
+
 }

@@ -2,29 +2,49 @@
 // Muestra las cafeterías en un mapa de Mapbox
 // El usuario puede añadir nuevas cafeterías
 
-import { useState, useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
+import { useState, useEffect } from "react";
 import { coffeeShopService } from "@/services/coffeeShopService";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import "./MapaPage.css";
 
-// Icono SVG personalizado para los marcadores
-const MARKER_SVG = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" width="40" height="50">
-  <circle cx="20" cy="20" r="18" fill="#c349ee" stroke="white" stroke-width="2"/>
-  <text x="20" y="26" text-anchor="middle" font-size="16">☕</text>
-  <polygon points="20,44 13,32 27,32" fill="#c349ee"/>
-</svg>
-`;
+// Icono SVG para los marcadores
+const markerIcon = L.divIcon({
+  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" width="40" height="50">
+    <circle cx="20" cy="20" r="18" fill="#c349ee" stroke="white" stroke-width="2"/>
+    <text x="20" y="26" text-anchor="middle" font-size="16">☕</text>
+    <polygon points="20,44 13,32 27,32" fill="#c349ee"/>
+  </svg>`,
+  className: "",
+  iconSize: [40, 50],
+  iconAnchor: [20, 50],
+});
+
+function FlyTo({ center, zoom }) {
+  const map = useMap();
+  useEffect(() => {
+    if (center) map.flyTo(center, zoom ?? 14);
+  }, [center, zoom, map]);
+  return null;
+}
+
+function LocateUser() {
+  const map = useMap();
+  useEffect(() => {
+    navigator.geolocation?.getCurrentPosition((pos) => {
+      map.flyTo([pos.coords.latitude, pos.coords.longitude], 12);
+    });
+  }, [map]);
+  return null;
+}
 
 export default function MapaPage() {
-  const mapContainer = useRef(null);
-  const map = useRef(null);
-  const markersRef = useRef([]);
-
   const [coffeeShops, setCoffeeShops] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedShop, setSelectedShop] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [flyTo, setFlyTo] = useState(null);
 
   // Form de nueva cafetería
   const [formData, setFormData] = useState({
@@ -42,69 +62,6 @@ export default function MapaPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // Inicializa el mapa
-  useEffect(() => {
-    if (map.current) return;
-
-    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/dark-v11",
-      center: [-3.7038, 40.4168], // Madrid por defecto
-      zoom: 5,
-    });
-
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-    // Intenta centrar en la ubicación del usuario
-    navigator.geolocation?.getCurrentPosition((pos) => {
-      map.current.flyTo({
-        center: [pos.coords.longitude, pos.coords.latitude],
-        zoom: 12,
-      });
-    });
-
-    return () => map.current?.remove();
-  }, []);
-
-  // Carga las cafeterías
-  useEffect(() => {
-    loadCoffeeShops();
-  }, []);
-
-  // Añade marcadores cuando carga el mapa y las cafeterías
-  useEffect(() => {
-    if (!map.current || coffeeShops.length === 0) return;
-
-    const addMarkers = () => {
-      markersRef.current.forEach((m) => m.remove());
-      markersRef.current = [];
-
-      coffeeShops.forEach((shop) => {
-        const el = document.createElement("div");
-        el.innerHTML = MARKER_SVG;
-        el.style.cursor = "pointer";
-        el.style.width = "40px";
-        el.style.height = "50px";
-        el.addEventListener("click", () => setSelectedShop(shop));
-
-        const marker = new mapboxgl.Marker({ element: el })
-          .setLngLat([shop.lng, shop.lat])
-          .addTo(map.current);
-
-        markersRef.current.push(marker);
-      });
-    };
-
-    // Espera a que el mapa esté completamente cargado
-    if (map.current.loaded()) {
-      addMarkers();
-    } else {
-      map.current.once("load", addMarkers);
-    }
-  }, [coffeeShops]);
-
   const loadCoffeeShops = async () => {
     try {
       const data = await coffeeShopService.getCoffeeShops();
@@ -115,6 +72,10 @@ export default function MapaPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadCoffeeShops();
+  }, []);
 
   // Autocomplete de ubicación con Photon
   useEffect(() => {
@@ -164,10 +125,7 @@ export default function MapaPage() {
     setLocationSuggestions([]);
 
     // Centra el mapa en la ubicación seleccionada
-    map.current?.flyTo({
-      center: [suggestion.lng, suggestion.lat],
-      zoom: 14,
-    });
+    setFlyTo([suggestion.lat, suggestion.lng]);
   };
 
   const handleSave = async () => {
@@ -224,7 +182,26 @@ export default function MapaPage() {
   return (
     <div className="mapa-page">
       {/* Mapa */}
-      <div ref={mapContainer} className="mapa-container" />
+      <MapContainer
+        center={[40.4168, -3.7038]}
+        zoom={5}
+        className="mapa-container"
+      >
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution="&copy; OpenStreetMap &copy; CARTO"
+        />
+        <LocateUser />
+        {flyTo && <FlyTo center={flyTo} zoom={14} />}
+        {coffeeShops.map((shop) => (
+          <Marker
+            key={shop.id}
+            position={[shop.lat, shop.lng]}
+            icon={markerIcon}
+            eventHandlers={{ click: () => setSelectedShop(shop) }}
+          />
+        ))}
+      </MapContainer>
 
       {/* Botón añadir cafetería */}
       <button className="mapa-add-btn" onClick={() => setShowModal(true)}>
@@ -333,7 +310,7 @@ export default function MapaPage() {
         </div>
       )}
 
-      {/* Panel de detalle de cafetería */}
+      {/* Panel de detalle */}
       {selectedShop && (
         <div className="mapa-detail">
           <button

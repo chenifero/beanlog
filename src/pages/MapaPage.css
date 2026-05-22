@@ -15,8 +15,10 @@
 /* Botón flotante para añadir cafetería */
 .mapa-add-btn {
   position: absolute;
-  top: var(--spacing-lg);
-  left: var(--spacing-lg);
+  bottom: 40px;
+  right: var(--spacing-lg);
+  top: auto;
+  left: auto;
   background: var(--amber);
   color: white;
   border: none;
@@ -26,7 +28,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  z-index: 10;
+  z-index: 1000;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   transition: all var(--transition-base);
 }
@@ -165,7 +167,7 @@
   padding: var(--spacing-lg);
   min-width: 280px;
   max-width: 360px;
-  z-index: 10;
+  z-index: 1000;
   box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 
@@ -241,9 +243,14 @@
 
 @media (max-width: 767px) {
   .mapa-add-btn {
-    top: auto;
-    bottom: 80px;
-    left: var(--spacing-md);
+    bottom: 40px;
+    right: var(--spacing-md);
+    left: auto;;
+    z-index: 1000;
+  }
+
+  .mapa-page {
+    height: calc(100vh - 64px);
   }
 
   .mapa-detail {
@@ -252,5 +259,6 @@
     right: var(--spacing-md);
     transform: none;
     max-width: 100%;
+    z-index: 1000;
   }
 }
