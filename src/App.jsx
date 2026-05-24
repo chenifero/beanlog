@@ -15,6 +15,7 @@ import ProfilePages from '@/pages/ProfilePages'
 import MisCafesPage from '@/pages/MisCafesPage'
 import MapaPage from '@/pages/MapaPage'
 import UserProfilePage from '@/pages/UserProfilePage'
+import ResetPasswordPage from '@/pages/ResetPasswordPage'
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()
@@ -49,6 +50,7 @@ function AppRoutes() {
                 <Route path="/cafes" element={<MisCafesPage />} />
                 <Route path="/map" element={<MapaPage />} />
                 <Route path="/user/:username" element={<UserProfilePage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </AppShell>

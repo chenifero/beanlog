@@ -163,7 +163,10 @@ export default function SettingsPage() {
   const [selectedOrigins, setSelectedOrigins] = useState([]);
   const [experienceLevel, setExperienceLevel] = useState("");
 
-  // Apariencia
+  // Nuevo email y contraseña para la sección de cuenta
+  const [newEmail, setNewEmail] = useState("");
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
 
   // Autocomplete de ubicación con Photon
   const [locationSuggestions, setLocationSuggestions] = useState([]);
@@ -307,6 +310,35 @@ export default function SettingsPage() {
       showMessage("❌ Error al guardar los cambios");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleChangeEmail = async () => {
+    if (!newEmail) return;
+    setSavingEmail(true);
+    try {
+      await authService.updateEmail(newEmail);
+      setNewEmail("");
+      showMessage("✅ Revisa tu nuevo email y confirma el cambio");
+    } catch (err) {
+      const msg = err.message?.includes("rate limit")
+        ? "Demasiados intentos. Espera unos minutos."
+        : err.message || "Error al cambiar el email";
+      showMessage("❌ " + msg);
+    } finally {
+      setSavingEmail(false);
+    }
+  };
+
+  const handleSendPasswordReset = async () => {
+    setSavingPassword(true);
+    try {
+      await authService.sendPasswordReset(user.email);
+      showMessage("✅ Revisa tu email para cambiar la contraseña");
+    } catch (err) {
+      showMessage("❌ " + (err.message || "Error al enviar el enlace"));
+    } finally {
+      setSavingPassword(false);
     }
   };
 
@@ -608,19 +640,51 @@ export default function SettingsPage() {
         {activeSection === "account" && (
           <section className="settings-section">
             <h3 className="settings-section-title">Cuenta</h3>
-            <div className="settings-field">
-              <label>Email actual</label>
-              <input type="email" defaultValue={user?.email} disabled />
+
+            <div className="settings-subsection">
+              <h4 className="settings-subsection-title">Cambiar email</h4>
+              <div className="settings-field">
+                <label>Email actual</label>
+                <input type="email" value={user?.email} disabled />
+              </div>
+              <div className="settings-field">
+                <label>Nuevo email</label>
+                <input
+                  type="email"
+                  placeholder="nuevo@email.com"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                />
+              </div>
+              <button
+                className="settings-btn-primary"
+                onClick={handleChangeEmail}
+                disabled={savingEmail || !newEmail}
+              >
+                {savingEmail ? "Enviando..." : "Enviar confirmación"}
+              </button>
+              <p className="settings-hint">
+                Recibirás un email en la nueva dirección para confirmar el
+                cambio.
+              </p>
             </div>
-            <div className="settings-field">
-              <label>Nuevo email</label>
-              <input type="email" placeholder="nuevo@email.com" />
+
+            <div className="settings-divider" />
+
+            <div className="settings-subsection">
+              <h4 className="settings-subsection-title">Cambiar contraseña</h4>
+              <p className="settings-hint">
+                Te enviaremos un enlace a <strong>{user?.email}</strong> para
+                establecer una nueva contraseña.
+              </p>
+              <button
+                className="settings-btn-secondary"
+                onClick={handleSendPasswordReset}
+                disabled={savingPassword}
+              >
+                {savingPassword ? "Enviando..." : "Enviar enlace de cambio"}
+              </button>
             </div>
-            <div className="settings-field">
-              <label>Nueva contraseña</label>
-              <input type="password" placeholder="••••••••" />
-            </div>
-            <button className="settings-btn-primary">Guardar cambios</button>
 
             <div className="settings-divider" />
 

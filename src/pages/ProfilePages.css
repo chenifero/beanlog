@@ -2,6 +2,7 @@
   max-width: 600px;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
+  position: relative;
 }
 
 .profile-header {
@@ -53,17 +54,40 @@
   margin: 0;
 }
 
+.profile-header-actions {
+  position: absolute;
+  top: 4%;
+  right: calc(-2 * var(--spacing-lg));
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .profile-settings-btn {
-  position: fixed;
-  top: 16px;
-  right: 16px;
   background: transparent;
   border: none;
   color: var(--text-dim);
   cursor: pointer;
   border-radius: var(--radius-sm);
   transition: color var(--transition-base);
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-friends-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem;
+  transition: color var(--transition-base);
+}
+
+.profile-friends-btn:hover {
+  color: var(--amber);
 }
 
 .profile-settings-btn:hover {
@@ -179,14 +203,3 @@
   padding: var(--spacing-xl);
 }
 
-
-@media (max-width: 767px) {
-  .profile-settings-btn {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-}

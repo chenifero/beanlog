@@ -130,6 +130,7 @@
 /* Cuando está colapsada el avatar se centra */
 .sidebar.collapsed .user-profile {
   justify-content: center;
+  background-color: transparent;
 }
 
 .user-info {

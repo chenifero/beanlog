@@ -1,0 +1,148 @@
+.friends-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.friends-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.friends-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.friends-header h3 {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--text);
+  margin: 0;
+}
+
+.friends-close {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.friends-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.friends-tab {
+  flex: 1;
+  padding: 0.75rem;
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all var(--transition-base);
+  border-bottom: 2px solid transparent;
+}
+
+.friends-tab.active {
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+  font-weight: 600;
+}
+
+.friends-tab span {
+  background: var(--amber-subtle);
+  color: var(--amber);
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+}
+
+.friends-list {
+  overflow-y: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.friends-hint {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  padding: 1.5rem;
+}
+
+.friends-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background var(--transition-base);
+}
+
+.friends-item:hover {
+  background: var(--amber-subtle);
+}
+
+.friends-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--amber-subtle);
+  color: var(--amber);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.friends-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.friends-info { flex: 1; min-width: 0; }
+
+.friends-username {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  margin: 0;
+}
+
+.friends-bio {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
