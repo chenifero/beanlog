@@ -2,6 +2,7 @@
 // Maneja creación, listado, eliminación y subida de fotos
 
 import { supabase } from "./supabase";
+import { notificationService } from "./notificationService";
 
 export const postService = {
   // Obtiene el feed completo ordenao por fecha
@@ -180,6 +181,27 @@ export const postService = {
       .single();
 
     if (error) throw error;
+    try {
+      const { data: followers } = await supabase
+        .from("follows")
+        .select("user_id")
+        .eq("following_id", userId);
+      if (followers?.length) {
+        await Promise.allSettled(
+          followers.map((f) =>
+            notificationService.createNotification(
+              f.user_id,
+              userId,
+              "new_post",
+              data.id,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      console.warn("Notificaciones no creadas:", e);
+    }
+    return data;
     return data;
   },
 
@@ -254,6 +276,23 @@ export const postService = {
         .from("likes")
         .insert({ user_id: userId, post_id: postId });
       if (error) throw error;
+      try {
+        const { data: post } = await supabase
+          .from("posts")
+          .select("user_id")
+          .eq("id", postId)
+          .single();
+        if (post)
+          await notificationService.createNotification(
+            post.user_id,
+            userId,
+            "like",
+            postId,
+          );
+      } catch (e) {
+        console.warn("Notificación no creada:", e);
+      }
+      return true;
       return true;
     }
   },
@@ -295,6 +334,22 @@ export const postService = {
       .single();
 
     if (error) throw error;
+    try {
+      const { data: post } = await supabase
+        .from("posts")
+        .select("user_id")
+        .eq("id", postId)
+        .single();
+      if (post)
+        await notificationService.createNotification(
+          post.user_id,
+          userId,
+          "comment",
+          postId,
+        );
+    } catch (e) {
+      console.warn("Notificación no creada:", e);
+    }
     return data;
   },
 

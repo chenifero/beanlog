@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Spinner from "@/components/ui/Spinner";
 import { FcGoogle } from "react-icons/fc";
-import "./AuthPage.css";
+import "./LoginPage.css";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");

@@ -1,50 +1,60 @@
 //Maneja los seguimientos entre users
 
-import { supabase } from './supabase'
+import { supabase } from "./supabase";
+import { notificationService } from "./notificationService";
 
 export const followService = {
   async follow(userId, targetId) {
     const { error } = await supabase
-      .from('follows')
-      .insert({ user_id: userId, following_id: targetId })
-    if (error) throw error
+      .from("follows")
+      .insert({ user_id: userId, following_id: targetId });
+    if (error) throw error;
+    try {
+      await notificationService.createNotification(targetId, userId, "follow");
+    } catch (e) {
+      console.warn("Error creando notificación de follow:", e);
+    }
   },
 
   async unfollow(userId, targetId) {
     const { error } = await supabase
-      .from('follows')
+      .from("follows")
       .delete()
-      .eq('user_id', userId)
-      .eq('following_id', targetId)
-    if (error) throw error
+      .eq("user_id", userId)
+      .eq("following_id", targetId);
+    if (error) throw error;
   },
 
   async isFollowing(userId, targetId) {
     const { data, error } = await supabase
-      .from('follows')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('following_id', targetId)
-      .maybeSingle()
-    if (error) throw error
-    return !!data
+      .from("follows")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("following_id", targetId)
+      .maybeSingle();
+    if (error) throw error;
+    return !!data;
   },
 
   async getFollowing(userId) {
     const { data, error } = await supabase
-      .from('follows')
-      .select('following_id, profiles!follows_following_id_fkey(id, username, avatar_url, bio)')
-      .eq('user_id', userId)
-    if (error) throw error
-    return data.map(d => d.profiles)
+      .from("follows")
+      .select(
+        "following_id, profiles!follows_following_id_fkey(id, username, avatar_url, bio)",
+      )
+      .eq("user_id", userId);
+    if (error) throw error;
+    return data.map((d) => d.profiles);
   },
 
   async getFollowers(userId) {
     const { data, error } = await supabase
-      .from('follows')
-      .select('user_id, profiles!follows_user_id_fkey(id, username, avatar_url, bio)')
-      .eq('following_id', userId)
-    if (error) throw error
-    return data.map(d => d.profiles)
+      .from("follows")
+      .select(
+        "user_id, profiles!follows_user_id_fkey(id, username, avatar_url, bio)",
+      )
+      .eq("following_id", userId);
+    if (error) throw error;
+    return data.map((d) => d.profiles);
   },
-}
+};

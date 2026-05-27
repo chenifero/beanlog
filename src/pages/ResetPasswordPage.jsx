@@ -17,15 +17,14 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hash = window.location.hash
-    if (hash.includes('type=recovery')) {
-      setValidSession(true)
-      return
-    }
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') setValidSession(true)
-    })
-    return () => subscription.unsubscribe()
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+        setValidSession(true);
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleSubmit = async () => {
@@ -69,7 +68,10 @@ export default function ResetPasswordPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <button className="reset-eye" onClick={() => setShowPassword(p => !p)}>
+                <button
+                  className="reset-eye"
+                  onClick={() => setShowPassword((p) => !p)}
+                >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
@@ -83,12 +85,19 @@ export default function ResetPasswordPage() {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                 />
-                <button className="reset-eye" onClick={() => setShowConfirm(p => !p)}>
+                <button
+                  className="reset-eye"
+                  onClick={() => setShowConfirm((p) => !p)}
+                >
                   {showConfirm ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
             </div>
-            <button className="reset-btn" onClick={handleSubmit} disabled={loading}>
+            <button
+              className="reset-btn"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
               {loading ? "Guardando..." : "Guardar contraseña"}
             </button>
           </>

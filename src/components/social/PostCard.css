@@ -271,8 +271,8 @@
 /* Input de comentario */
 .post-comment-input-row {
   display: flex;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-xs);
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .post-comment-input {

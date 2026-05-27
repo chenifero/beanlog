@@ -17,6 +17,7 @@ import MapaPage from '@/pages/MapaPage'
 import UserProfilePage from '@/pages/UserProfilePage'
 import ResetPasswordPage from '@/pages/ResetPasswordPage'
 import PostDetailPage from '@/pages/PostDetailPage'
+import NotificationsPage from '@/pages/NotificationsPage'
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()
@@ -53,6 +54,7 @@ function AppRoutes() {
                 <Route path="/user/:username" element={<UserProfilePage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/post/:postId" element={<PostDetailPage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </AppShell>
