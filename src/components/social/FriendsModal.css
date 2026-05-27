@@ -142,7 +142,10 @@
   font-size: 0.8rem;
   color: var(--text-dim);
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.friends-handle {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin: 0;
 }

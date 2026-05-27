@@ -1,0 +1,92 @@
+.mention-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.mention-input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 0.55rem 1rem;
+  outline: none;
+  resize: none;
+  transition: border-color var(--transition-base);
+  box-sizing: border-box;
+}
+
+.mention-input:focus {
+  border-color: var(--amber);
+}
+
+textarea.mention-input {
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+}
+
+.mention-dropdown {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 200;
+  overflow: hidden;
+}
+
+.mention-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: background var(--transition-base);
+}
+
+.mention-item:hover {
+  background: var(--amber-subtle);
+}
+
+.mention-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--amber-subtle);
+  color: var(--amber);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.mention-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mention-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.mention-displayname {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mention-handle {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}

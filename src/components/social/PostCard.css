@@ -169,7 +169,7 @@
 /* Info de cata */
 .post-tasting-info,
 .post-visit-info {
-  margin: 0 var(--spacing-lg) var(--spacing-md);
+  margin: var(--spacing-md) var(--spacing-lg) 0;
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -212,19 +212,24 @@
   background: transparent;
   border: none;
   color: var(--text-dim);
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   cursor: pointer;
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: 0.5rem;
   border-radius: var(--radius-sm);
   transition: all var(--transition-base);
   display: flex;
   align-items: center;
   gap: 4px;
+  min-width: 52px;
 }
 
 .post-action-btn:hover {
   background: var(--amber-subtle);
   color: var(--amber);
+}
+
+.post-clickable {
+  cursor: pointer;
 }
 
 .post-action-btn.liked {
@@ -305,4 +310,30 @@
 
 .post-comment-send:hover {
   background: var(--amber-soft);
+}
+
+.post-handle {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.tasting-chips-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0.75rem var(--spacing-lg);
+}
+
+.tasting-chip-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+  font-size: 0.88rem;
+}
+
+.tasting-chip-item svg {
+  color: var(--amber);
+  flex-shrink: 0;
 }

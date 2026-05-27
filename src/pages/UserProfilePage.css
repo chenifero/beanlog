@@ -93,3 +93,34 @@
   padding: var(--spacing-xl);
   color: var(--muted);
 }
+
+.uprofile-handle {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.uprofile-follow-btn {
+  margin-top: var(--spacing-md);
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  border: 1px solid var(--amber);
+  background: var(--amber);
+  color: white;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.uprofile-follow-btn.following {
+  background: transparent;
+  color: var(--text-dim);
+  border-color: var(--border);
+}
+
+.uprofile-follow-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

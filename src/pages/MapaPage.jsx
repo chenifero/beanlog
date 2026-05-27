@@ -5,6 +5,9 @@
 import { useState, useEffect } from "react";
 import { coffeeShopService } from "@/services/coffeeShopService";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import { useAuth } from "@/context/AuthContext";
+import { postService } from "@/services/postService";
+import MentionInput from '@/components/ui/MentionInput'
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./MapaPage.css";
@@ -64,14 +67,22 @@ function Carrusel({ fotos }) {
           <button
             className="mapa-carrusel-btn left"
             onClick={() => setIdx((i) => (i - 1 + fotos.length) % fotos.length)}
-          >‹</button>
+          >
+            ‹
+          </button>
           <button
             className="mapa-carrusel-btn right"
             onClick={() => setIdx((i) => (i + 1) % fotos.length)}
-          >›</button>
+          >
+            ›
+          </button>
           <div className="mapa-carrusel-dots">
             {fotos.map((_, i) => (
-              <span key={i} className={`dot${i === idx ? " active" : ""}`} onClick={() => setIdx(i)} />
+              <span
+                key={i}
+                className={`dot${i === idx ? " active" : ""}`}
+                onClick={() => setIdx(i)}
+              />
             ))}
           </div>
         </>
@@ -86,6 +97,7 @@ export default function MapaPage() {
   const [selectedShop, setSelectedShop] = useState(null);
   const [loading, setLoading] = useState(true);
   const [flyTo, setFlyTo] = useState(null);
+  const { user } = useAuth();
 
   // Foto de la cafetería
   const [fotoFiles, setFotoFiles] = useState([]);
@@ -209,6 +221,24 @@ export default function MapaPage() {
         foto_urls: foto_urls || null,
       });
       setCoffeeShops((prev) => [...prev, shop]);
+      try {
+        const content = [
+          formData.notas || "",
+          formData.valoracion ? `Valoración: ${formData.valoracion}/10` : "",
+        ]
+          .filter(Boolean)
+          .join("\n");
+
+        await postService.createPost(user.id, {
+          type: "visit",
+          coffeeShopId: shop.id,
+          content,
+          imageUrls: foto_urls,
+          rating: formData.valoracion || null,
+        });
+      } catch (postErr) {
+        console.warn("Post no creado:", postErr);
+      }
       setShowModal(false);
       setFotoFiles([]);
       setFotoPreviews([]);
@@ -372,7 +402,7 @@ export default function MapaPage() {
 
               <div className="mapa-field">
                 <label>Notas</label>
-                <textarea
+                <MentionInput
                   placeholder="Ambiente, especialidad, horario..."
                   rows={3}
                   value={formData.notas}

@@ -144,6 +144,10 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
+  const [displayName, setDisplayName] = useState("");
+
+  const [locationTouched, setLocationTouched] = useState(false);
+
   const { user, profile, refreshProfile } = useAuth();
 
   // Campos del perfil
@@ -180,6 +184,7 @@ export default function SettingsPage() {
     const loadProfile = async () => {
       try {
         const profile = await profileService.getProfile(user.id);
+        setDisplayName(profile.display_name || "");
         setUsername(profile.username || "");
         setBio(profile.bio || "");
         setLocation(profile.location || "");
@@ -201,7 +206,7 @@ export default function SettingsPage() {
 
   // Busca sugerencias de ciudad en Photon con debounce de 300ms
   useEffect(() => {
-    if (location.length < 2) {
+    if (!locationTouched || location.length < 2) {
       setLocationSuggestions([]);
       setShowSuggestions(false);
       return;
@@ -267,6 +272,7 @@ export default function SettingsPage() {
     try {
       await profileService.updateProfile(user.id, {
         username,
+        display_name: displayName,
         bio,
         location,
         gender: gender === "personalizado" ? customGender : gender,
@@ -417,13 +423,25 @@ export default function SettingsPage() {
               </button>
             </div>
             <div className="settings-field">
-              <label>Nombre de usuario</label>
+              <label>Nombre visible</label>
               <input
                 type="text"
-                placeholder="@usuario"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Nombre para mostrar en tu perfil"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
               />
+            </div>
+            <div className="settings-field">
+              <label>Nombre de usuario (@usuario_ejemplo)</label>
+              <input
+                type="text"
+                placeholder="sluis98"
+                value={username}
+                onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+              />
+              <p className="settings-hint">
+                Solo letras minúsculas, números y guiones bajos.
+              </p>
             </div>
             <div className="settings-field">
               <label>Bio</label>
@@ -431,8 +449,14 @@ export default function SettingsPage() {
                 placeholder="Cuéntanos algo sobre ti..."
                 rows={3}
                 value={bio}
+                maxLength={150}
                 onChange={(e) => setBio(e.target.value)}
               />
+              <p
+                className={`settings-char-count ${bio.length >= 140 ? "warning" : ""}`}
+              >
+                {bio.length}/150
+              </p>
             </div>
             <div className="settings-field">
               <label>Ubicación</label>
@@ -442,7 +466,11 @@ export default function SettingsPage() {
                   placeholder="Madrid, España"
                   value={location}
                   autoComplete="off"
-                  onChange={(e) => setLocation(e.target.value)}
+                  onChange={(e) => {
+                    setLocationTouched(true);
+                    setLocation(e.target.value);
+                  }}
+                  onFocus={() => setLocationTouched(true)}
                   onBlur={() =>
                     setTimeout(() => setShowSuggestions(false), 150)
                   }

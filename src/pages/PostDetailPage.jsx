@@ -1,25 +1,20 @@
-// Tarjeta de publicación del feed
-// Muestra: autor, fotos en carrusel, texto, info de cata/cafetería y likes/comentarios
-
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { postService } from "@/services/postService";
+import { followService } from "@/services/followService";
 import { useAuth } from "@/context/AuthContext";
-import "./PostCard.css";
-import { FaCoffee } from "react-icons/fa";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
-import { FcLike } from "react-icons/fc";
-import { FcLikePlaceholder } from "react-icons/fc";
-import { FaComment } from "react-icons/fa";
-import { FaLocationDot } from "react-icons/fa6";
 import { BiSolidCoffeeBean } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
-import { FaChevronLeft } from "react-icons/fa";
-import { FaChevronRight } from "react-icons/fa";
+import { FaLocationDot } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaPaperPlane } from "react-icons/fa";
+import { savedPostsService } from "@/services/savedPostsService";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa";
+import { FaComment } from "react-icons/fa";
 import MentionInput from "@/components/ui/MentionInput";
 import MentionText from "@/components/ui/MentionText";
+import "./PostDetailPage.css";
 
-// Formatea la fecha relativa — "hace 2 horas", "hace 3 días"
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -29,25 +24,6 @@ function timeAgo(dateStr) {
   if (mins < 60) return `hace ${mins}m`;
   if (hours < 24) return `hace ${hours}h`;
   return `hace ${days}d`;
-}
-
-// Etiqueta del nivel de experiencia
-function levelLabel(level) {
-  const config = {
-    Casual: { count: 1, text: "Casual" },
-    Enthusiast: { count: 2, text: "Enthusiast" },
-    Barista: { count: 3, text: "Barista" },
-  };
-  const { count, text } = config[level] || config.Casual;
-  return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-      {/* Creamos un array vacío del tamaño de 'count' para repetir el icono */}
-      {[...Array(count)].map((_, index) => (
-        <FaCoffee key={index} />
-      ))}
-      <span style={{ marginLeft: "4px" }}>{text}</span>
-    </span>
-  );
 }
 
 const SVG_ICONS = {
@@ -123,45 +99,80 @@ function TastingChips({ content }) {
   );
 }
 
-export default function PostCard({ post, onDelete }) {
-  const navigate = useNavigate();
-  const { user } = useAuth();
+export default function PostDetailPage() {
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-  const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [currentPhoto, setCurrentPhoto] = useState(0);
-  const [commentsCount, setCommentsCount] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const { postId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const isOwner = user?.id === post.user_id;
-  const photos = post.image_urls || [];
+  const handleSave = async () => {
+    setSaveLoading(true);
+    try {
+      if (saved) {
+        await savedPostsService.unsavePost(user.id, post.id);
+      } else {
+        await savedPostsService.savePost(user.id, post.id);
+      }
+      setSaved((prev) => !prev);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaveLoading(false);
+    }
+  };
 
-  // Alterna el like y actualiza el contador localmente
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [p, count, hasLiked, cmts, isSavedResult] = await Promise.all([
+          postService.getPostById(postId),
+          postService.getLikesCount(postId),
+          postService.hasLiked(user.id, postId),
+          postService.getComments(postId),
+          savedPostsService.isSaved(user.id, postId),
+        ]);
+        setPost(p);
+        setLikesCount(count);
+        setLiked(hasLiked);
+        setComments(cmts);
+        setSaved(isSavedResult);
+
+        if (p.profiles?.id && p.profiles.id !== user.id) {
+          const following = await followService.isFollowing(
+            user.id,
+            p.profiles.id,
+          );
+          setIsFollowing(following);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [postId]);
+
   const handleLike = async () => {
     try {
       const isNowLiked = await postService.toggleLike(user.id, post.id);
       setLiked(isNowLiked);
       setLikesCount((prev) => (isNowLiked ? prev + 1 : prev - 1));
     } catch (err) {
-      console.error("Error al dar like:", err);
+      console.error(err);
     }
   };
 
-  // Carga los comentarios al abrir la sección
-  const handleToggleComments = async () => {
-    if (!showComments && comments.length === 0) {
-      try {
-        const data = await postService.getComments(post.id);
-        setComments(data);
-      } catch (err) {
-        console.error("Error cargando comentarios:", err);
-      }
-    }
-    setShowComments((prev) => !prev);
-  };
-
-  // Envía un nuevo comentario
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     try {
@@ -171,172 +182,151 @@ export default function PostCard({ post, onDelete }) {
         newComment,
       );
       setComments((prev) => [...prev, comment]);
-      setCommentsCount((prev) => prev + 1);
       setNewComment("");
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm("¿Eliminar esta publicación?")) return;
+  const toggleFollow = async () => {
+    setFollowLoading(true);
     try {
-      await postService.deletePost(post.id);
-      onDelete?.(post.id);
+      if (isFollowing) {
+        await followService.unfollow(user.id, post.profiles.id);
+      } else {
+        await followService.follow(user.id, post.profiles.id);
+      }
+      setIsFollowing((prev) => !prev);
     } catch (err) {
-      console.error("Error al eliminar:", err);
+      console.error(err);
+    } finally {
+      setFollowLoading(false);
     }
   };
 
-  useEffect(() => {
-    const loadLikes = async () => {
-      try {
-        const [count, hasLiked, cCount] = await Promise.all([
-          postService.getLikesCount(post.id),
-          postService.hasLiked(user.id, post.id),
-          postService.getCommentsCount(post.id),
-        ]);
-        setLikesCount(count);
-        setLiked(hasLiked);
-        setCommentsCount(cCount);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    loadLikes();
-  }, [post.id]);
+  if (loading) return <div className="postdetail-loading">Cargando...</div>;
+  if (!post)
+    return <div className="postdetail-loading">Publicación no encontrada</div>;
+
+  const photos = post.image_urls || [];
+  const isOwn = user.id === post.user_id;
 
   return (
-    <article className="post-card">
-      {/* Cabecera — avatar, nombre, nivel, fecha */}
-      <div className="post-header">
+    <div className="postdetail-page">
+      {/* Header autor */}
+      <div className="postdetail-header">
+        <button className="postdetail-back" onClick={() => navigate(-1)}>
+          ✕
+        </button>
         <div
-          className="post-avatar"
+          className="postdetail-avatar"
           onClick={() => navigate(`/user/${post.profiles?.username}`)}
-          style={{ cursor: "pointer" }}
         >
           {post.profiles?.avatar_url ? (
-            <img
-              src={post.profiles.avatar_url}
-              alt={post.profiles.display_name || post.profiles.username}
-            />
+            <img src={post.profiles.avatar_url} alt={post.profiles.username} />
           ) : (
             post.profiles?.username?.charAt(0).toUpperCase()
           )}
         </div>
-        <div className="post-author-info">
-          <span
-            className="post-username"
-            onClick={() => navigate(`/user/${post.profiles?.username}`)}
-            style={{ cursor: "pointer" }}
-          >
-            {post.profiles?.display_name ||
-              post.profiles?.username ||
-              "Usuario"}
-          </span>
-          <span className="post-handle">@{post.profiles?.username}</span>
-          <span className="post-level">
-            {levelLabel(post.profiles?.experience_level)}
-          </span>
+        <div
+          className="postdetail-author-info"
+          onClick={() => navigate(`/user/${post.profiles?.username}`)}
+        >
+          <p className="postdetail-displayname">
+            {post.profiles?.display_name || post.profiles?.username}
+          </p>
+          <p className="postdetail-handle">@{post.profiles?.username}</p>
         </div>
-        <div className="post-meta">
-          <span className="post-time">{timeAgo(post.created_at)}</span>
-          {/* Solo el autor ve el botón de eliminar */}
-          {isOwner && (
+        <div className="postdetail-header-right">
+          <span className="postdetail-time">{timeAgo(post.created_at)}</span>
+          {!isOwn && (
             <button
-              className="post-delete-btn"
-              onClick={handleDelete}
-              title="Eliminar"
+              className={`postdetail-follow-btn ${isFollowing ? "following" : ""}`}
+              onClick={toggleFollow}
+              disabled={followLoading}
             >
-              ✕
+              {followLoading ? "..." : isFollowing ? "Siguiendo" : "+ Seguir"}
             </button>
           )}
         </div>
       </div>
 
-      <div
-        className="post-clickable"
-        onClick={() => navigate(`/post/${post.id}`)}
-      >
-        {photos.length > 0 && (
-          <div className="post-photos">
-            <img
-              src={photos[currentPhoto]}
-              alt={`foto ${currentPhoto + 1}`}
-              className="post-photo"
-            />
-            {/* Controles del carrusel — solo si hay más de una foto */}
-            {photos.length > 1 && (
-              <>
-                <button
-                  className="post-photo-prev"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentPhoto((prev) => Math.max(0, prev - 1));
-                  }}
-                  disabled={currentPhoto === 0}
-                >
-                  <FaChevronLeft />
-                </button>
-                <button
-                  className="post-photo-next"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentPhoto((prev) =>
-                      Math.min(photos.length - 1, prev + 1),
-                    );
-                  }}
-                  disabled={currentPhoto === photos.length - 1}
-                >
-                  <FaChevronRight />
-                </button>
-                {/* Indicadores de punto */}
-                <div className="post-photo-dots">
-                  {photos.map((_, i) => (
-                    <span
-                      key={i}
-                      className={`post-photo-dot ${i === currentPhoto ? "active" : ""}`}
-                      onClick={() => setCurrentPhoto(i)}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        )}
-        {/* Info extra si es una visita */}
-        {post.type === "visit" && post.coffee_shops && (
-          <div className="post-visit-info">
-            <span className="post-visit-name">
-              <FaLocationDot /> {post.coffee_shops.nombre}
-            </span>
-            {post.rating && (
-              <span className="post-tasting-score">{post.rating}/10</span>
-            )}
-          </div>
-        )}
+      {/* Ubicación */}
+      {post.location && (
+        <div className="postdetail-location">
+          <FaLocationDot /> {post.location}
+        </div>
+      )}
 
-        {/* Info extra si es una cata */}
-        {post.type === "tasting" && post.tastings && (
-          <div className="post-tasting-info">
-            <span className="post-tasting-name">
-              <BiSolidCoffeeBean />{" "}
-              {post.tastings.cafes_master?.nombre || "Café sin nombre"}
-            </span>
-            {post.tastings.cafes_master?.origen && (
-              <span className="post-tasting-origin">
-                {post.tastings.cafes_master.origen}
-              </span>
-            )}
-            {post.tastings.puntuacion && (
-              <span className="post-tasting-score">
-                {post.tastings.puntuacion}/10
-              </span>
-            )}
-          </div>
-        )}
+      {/* Fotos */}
+      {photos.length > 0 && (
+        <div className="postdetail-photos">
+          <img
+            src={photos[currentPhoto]}
+            alt={`foto ${currentPhoto + 1}`}
+            className="postdetail-photo"
+          />
+          {photos.length > 1 && (
+            <>
+              <button
+                className="postdetail-photo-prev"
+                onClick={() => setCurrentPhoto((prev) => Math.max(0, prev - 1))}
+                disabled={currentPhoto === 0}
+              >
+                <FaChevronLeft />
+              </button>
+              <button
+                className="postdetail-photo-next"
+                onClick={() =>
+                  setCurrentPhoto((prev) =>
+                    Math.min(photos.length - 1, prev + 1),
+                  )
+                }
+                disabled={currentPhoto === photos.length - 1}
+              >
+                <FaChevronRight />
+              </button>
+              <div className="postdetail-dots">
+                {photos.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`postdetail-dot ${i === currentPhoto ? "active" : ""}`}
+                    onClick={() => setCurrentPhoto(i)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
-        {/* Texto del post */}
+      {/* Info cata */}
+      {post.type === "tasting" && post.tastings && (
+        <div className="postdetail-tasting">
+          <span className="postdetail-tasting-name">
+            <BiSolidCoffeeBean />{" "}
+            {post.tastings.cafes_master?.nombre || "Café sin nombre"}
+          </span>
+          {post.tastings.cafes_master?.origen && (
+            <span className="postdetail-tasting-origin">
+              {post.tastings.cafes_master.origen}
+            </span>
+          )}
+          {post.tastings.cafes_master?.proceso && (
+            <span className="postdetail-tasting-origin">
+              {post.tastings.cafes_master.proceso}
+            </span>
+          )}
+          {post.tastings.puntuacion && (
+            <span className="postdetail-tasting-score">
+              {post.tastings.puntuacion}/10
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className="postdetail-body">
+        {/* Texto */}
         {post.content?.startsWith("TASTING_DATA:") ? (
           <TastingChips content={post.content} />
         ) : (
@@ -346,58 +336,107 @@ export default function PostCard({ post, onDelete }) {
             </p>
           )
         )}
-      </div>
-      {/* Acciones — likes y comentarios */}
-      <div className="post-actions">
-        <button
-          className={`post-action-btn ${liked ? "liked" : ""}`}
-          onClick={handleLike}
-        >
-          {liked ? (
-            <IoIosHeart style={{ color: "var(--amber)" }} />
-          ) : (
-            <IoIosHeartEmpty style={{ color: "var(--amber)" }} />
-          )}
-          {likesCount > 0 && likesCount}
-        </button>
-        <button className="post-action-btn" onClick={handleToggleComments}>
-          <FaComment /> {commentsCount > 0 && commentsCount}
-        </button>
-      </div>
 
-      {/* Sección de comentarios */}
-      {showComments && (
-        <div className="post-comments">
+        {/* Info cafetería */}
+        {post.type === "visit" && post.coffee_shops && (
+          <div className="postdetail-tasting">
+            <span className="postdetail-tasting-name">
+              <FaLocationDot /> {post.coffee_shops.nombre}
+            </span>
+            {post.coffee_shops.ciudad && (
+              <span className="postdetail-tasting-origin">
+                {post.coffee_shops.ciudad}
+              </span>
+            )}
+            {post.rating && (
+              <span className="postdetail-tasting-score">{post.rating}/10</span>
+            )}
+          </div>
+        )}
+
+        {/* Likes + comentarios */}
+        <div className="postdetail-likes-row">
+          <button className="postdetail-like-btn" onClick={handleLike}>
+            {liked ? (
+              <IoIosHeart style={{ color: "var(--amber)" }} />
+            ) : (
+              <IoIosHeartEmpty style={{ color: "var(--amber)" }} />
+            )}
+          </button>
+          {likesCount > 0 && (
+            <span className="postdetail-likes-count">
+              {likesCount} {likesCount === 1 ? "like" : "likes"}
+            </span>
+          )}
+          <span className="postdetail-comment-count-info">
+            <FaComment style={{ color: "var(--amber)" }} />
+            {comments.length > 0 && comments.length}
+          </span>
+          <button
+            className="postdetail-save-btn"
+            onClick={handleSave}
+            disabled={saveLoading}
+            style={{ marginLeft: "auto" }}
+          >
+            {saved ? (
+              <FaBookmark style={{ color: "var(--amber)" }} />
+            ) : (
+              <FaRegBookmark style={{ color: "var(--text-dim)" }} />
+            )}
+          </button>
+        </div>
+
+        {/* Comentarios */}
+        <div className="postdetail-comments">
           {comments.length === 0 && (
-            <p className="post-no-comments">Sé el primero en comentar</p>
+            <p className="postdetail-no-comments">Sé el primero en comentar</p>
           )}
           {comments.map((comment) => (
-            <div key={comment.id} className="post-comment">
-              <span className="post-comment-user">
-                {comment.profiles?.username}
-              </span>
-              <span className="post-comment-text">
-                <MentionText text={comment.content} />
-              </span>
+            <div key={comment.id} className="postdetail-comment">
+              <div
+                className="postdetail-comment-avatar"
+                onClick={() => navigate(`/user/${comment.profiles?.username}`)}
+              >
+                {comment.profiles?.avatar_url ? (
+                  <img
+                    src={comment.profiles.avatar_url}
+                    alt={comment.profiles.username}
+                  />
+                ) : (
+                  comment.profiles?.username?.charAt(0).toUpperCase()
+                )}
+              </div>
+              <div className="postdetail-comment-body">
+                <span
+                  className="postdetail-comment-user"
+                  onClick={() =>
+                    navigate(`/user/${comment.profiles?.username}`)
+                  }
+                >
+                  {comment.profiles?.username}
+                </span>
+                <span className="postdetail-comment-text">
+                  <MentionText text={comment.content} />
+                </span>
+              </div>
             </div>
           ))}
-          {/* Input para añadir comentario */}
-          <div className="post-comment-input-row">
-            <MentionInput
-              value={newComment}
-              onChange={setNewComment}
-              placeholder="Añade un comentario..."
-              onKeyDown={(e) =>
-                e.key === "Enter" && !e.shiftKey && handleAddComment()
-              }
-              className="post-comment-input"
-            />
-            <button className="post-comment-send" onClick={handleAddComment}>
-              <FaPaperPlane />
-            </button>
-          </div>
         </div>
-      )}
-    </article>
+      </div>
+
+      {/* Input comentario fijo abajo */}
+      <div className="postdetail-comment-bar">
+        <MentionInput
+          value={newComment}
+          onChange={setNewComment}
+          placeholder="Añade un comentario..."
+          onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
+          className="postdetail-comment-input"
+        />
+        <button className="postdetail-comment-send" onClick={handleAddComment}>
+          <FaPaperPlane />
+        </button>
+      </div>
+    </div>
   );
 }

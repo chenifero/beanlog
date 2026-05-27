@@ -12,6 +12,7 @@ import {
   normalizeText,
 } from "@/utils/coffeeConstants";
 import "./MisCafesPage.css";
+import { FaCoffee } from "react-icons/fa";
 
 export default function MisCafesPage() {
   const { user } = useAuth();
@@ -218,7 +219,7 @@ export default function MisCafesPage() {
                 onChange={(e) => setFilterTueste(e.target.value)}
               >
                 <option value="">Todos</option>
-                {TUESTS.map((v) => (
+                {TUESTES.map((v) => (
                   <option key={v} value={v}>
                     {v}
                   </option>
@@ -292,7 +293,7 @@ export default function MisCafesPage() {
 
       {!loading && tastings.length === 0 && (
         <div className="mis-cafes-empty">
-          <p>☕</p>
+          <p><FaCoffee /></p>
           <p>Aún no tienes catas registradas.</p>
           <button
             className="tasting-btn-primary"
@@ -305,7 +306,7 @@ export default function MisCafesPage() {
 
       {!loading && tastings.length > 0 && filteredTastings.length === 0 && (
         <div className="mis-cafes-empty">
-          <p>🔍</p>
+          <p><FaSearch /></p>
           <p>No hay catas que coincidan con los filtros.</p>
           <button className="mis-cafes-reset-btn" onClick={resetFilters}>
             Limpiar filtros

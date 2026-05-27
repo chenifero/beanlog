@@ -44,7 +44,7 @@ export const postService = {
     return data;
   },
 
-  // Obtiene las publicaciones de un usuario específico por su ID
+  // Obtiene TODAS las publicaciones de un usuario específico por su ID
   async getPostsByUserId(userId) {
     const { data, error } = await supabase
       .from("posts")
@@ -58,6 +58,49 @@ export const postService = {
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  // Obtiene una publicación por su ID
+  async getPostById(postId) {
+    const { data, error } = await supabase
+      .from("posts")
+      .select(
+        `
+      *,
+      profiles!posts_user_id_fkey (
+        id,
+        username,
+        display_name,
+        avatar_url,
+        experience_level
+      ),
+      tastings (
+        id,
+        puntuacion,
+        notas,
+        radar_data,
+        cafes_master (
+          nombre,
+          origen,
+          proceso,
+          tueste
+        )
+      ),
+      coffee_shops (
+        id,
+        nombre,
+        lat,
+        lng,
+        ciudad,
+        pais
+      )
+    `,
+      )
+      .eq("id", postId)
+      .single();
+
     if (error) throw error;
     return data;
   },
@@ -188,9 +231,9 @@ export const postService = {
       .select("id")
       .eq("user_id", userId)
       .eq("post_id", postId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== "PGRST116") throw error;
+    if (error) throw error;
     return !!data;
   },
 
@@ -253,5 +296,15 @@ export const postService = {
 
     if (error) throw error;
     return data;
+  },
+
+  // Obtiene el número de comentarios de un post
+  async getCommentsCount(postId) {
+    const { count, error } = await supabase
+      .from("comments")
+      .select("*", { count: "exact", head: true })
+      .eq("post_id", postId);
+    if (error) throw error;
+    return count;
   },
 };

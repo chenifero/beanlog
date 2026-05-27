@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
 import { supabase } from "@/services/supabase";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./ResetPasswordPage.css";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -14,10 +17,15 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const hash = window.location.hash
+    if (hash.includes('type=recovery')) {
+      setValidSession(true)
+      return
+    }
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setValidSession(true);
-    });
-    return () => subscription.unsubscribe();
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') setValidSession(true)
+    })
+    return () => subscription.unsubscribe()
   }, []);
 
   const handleSubmit = async () => {
@@ -54,21 +62,31 @@ export default function ResetPasswordPage() {
             {error && <p className="reset-error">{error}</p>}
             <div className="reset-field">
               <label>Nueva contraseña</label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="reset-input-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button className="reset-eye" onClick={() => setShowPassword(p => !p)}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <div className="reset-field">
               <label>Confirmar contraseña</label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-              />
+              <div className="reset-input-wrapper">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                />
+                <button className="reset-eye" onClick={() => setShowConfirm(p => !p)}>
+                  {showConfirm ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <button className="reset-btn" onClick={handleSubmit} disabled={loading}>
               {loading ? "Guardando..." : "Guardar contraseña"}

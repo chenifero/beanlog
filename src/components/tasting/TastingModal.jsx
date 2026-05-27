@@ -26,6 +26,9 @@ import { FaCheck } from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import { ORIGENES, PROCESOS, TUESTES } from "@/utils/coffeeConstants";
+import html2canvas from "html2canvas";
+import { postService } from "@/services/postService";
+import MentionInput from '@/components/ui/MentionInput'
 import "./TastingModal.css";
 
 const RADAR_ATTRIBUTES = [
@@ -51,6 +54,8 @@ const STEPS = ["foto", "datos", "radar", "resumen"];
 export default function TastingModal({ onClose, onTastingCreated }) {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
+
+  const radarRef = useRef(null); // Referencia para el radar chart para exportarlo como imagen
 
   const [step, setStep] = useState("foto");
   const [loading, setLoading] = useState(false);
@@ -170,6 +175,48 @@ export default function TastingModal({ onClose, onTastingCreated }) {
         precio,
         fotoUrl,
       });
+
+      const parts = [
+        cafeData.origen ? `Origen: ${cafeData.origen}` : null,
+        cafeData.proceso ? `Proceso: ${cafeData.proceso}` : null,
+        cafeData.tueste ? `Tueste: ${cafeData.tueste}` : null,
+        cafeData.finca ? `Finca: ${cafeData.finca}` : null,
+        cafeData.sca ? `SCA: ${cafeData.sca}` : null,
+        precio ? `Precio: ${precio}` : null,
+        notas ? `Notas: ${notas}` : null,
+        `Puntuación: ${puntuacion}/10`,
+      ].filter(Boolean);
+
+      const content = `TASTING_DATA:${parts.join("|")}`;
+
+      // Capturar radar como imagen
+      let imageUrls = [];
+      if (fotoUrl) imageUrls.push(fotoUrl);
+
+      try {
+        const canvas = await html2canvas(radarRef.current, {
+          backgroundColor: "#1a0a2e",
+          scale: 2,
+          logging: false,
+          useCORS: true,
+        });
+        const blob = await new Promise((resolve) =>
+          canvas.toBlob(resolve, "image/png"),
+        );
+        const radarFile = new File([blob], "radar.png", { type: "image/png" });
+        const radarUrls = await postService.uploadImages(user.id, [radarFile]);
+        imageUrls = [...imageUrls, ...radarUrls];
+      } catch (radarErr) {
+        console.warn("No se pudo capturar el radar:", radarErr);
+      }
+
+      await postService.createPost(user.id, {
+        type: "tasting",
+        tastingId: tasting.id,
+        content,
+        imageUrls,
+      });
+
       onTastingCreated?.(tasting);
       onClose();
     } catch (err) {
@@ -188,6 +235,64 @@ export default function TastingModal({ onClose, onTastingCreated }) {
 
   const stepIndex = STEPS.indexOf(step);
 
+  const hiddenRadar = (
+    <div
+      ref={radarRef}
+      style={{
+        position: "fixed",
+        left: "-9999px",
+        top: "0",
+        width: "320px",
+        height: "280px",
+        pointerEvents: "none",
+        background: "#1a0a2e",
+        borderRadius: "12px",
+        padding: "16px",
+        fontFamily: "sans-serif",
+        zIndex: -1,
+      }}
+    >
+      <div
+        style={{
+          color: "#e8d5ff",
+          fontSize: "14px",
+          fontWeight: "700",
+          marginBottom: "4px",
+          textAlign: "center",
+        }}
+      >
+        {cafeData.nombre}
+      </div>
+      {cafeData.marca && (
+        <div
+          style={{
+            color: "#9b72cc",
+            fontSize: "11px",
+            textAlign: "center",
+            marginBottom: "8px",
+          }}
+        >
+          {cafeData.marca}
+        </div>
+      )}
+      <ResponsiveContainer width="100%" height={220}>
+        <RadarChart data={radarChartData} cx="50%" cy="50%" outerRadius="70%">
+          <PolarGrid stroke="rgba(255,255,255,0.15)" />
+          <PolarAngleAxis
+            dataKey="attribute"
+            tick={{ fill: "#9b72cc", fontSize: 10, fontWeight: 600 }}
+          />
+          <PolarRadiusAxis domain={[0, 10]} tick={false} axisLine={false} />
+          <Radar
+            dataKey="value"
+            stroke="#c349ee"
+            fill="#c349ee"
+            fillOpacity={0.3}
+          />
+        </RadarChart>
+      </ResponsiveContainer>
+    </div>
+  );
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="tasting-modal" onClick={(e) => e.stopPropagation()}>
@@ -589,7 +694,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                 {/* Notas */}
                 <div className="tasting-field">
                   <label>Notas de cata</label>
-                  <textarea
+                  <MentionInput
                     value={notas}
                     onChange={(e) => setNotas(e.target.value)}
                     placeholder="¿Qué sabores y aromas percibes?"
@@ -637,6 +742,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
           )}
         </div>
       </div>
+      {hiddenRadar}
     </div>
   );
 }

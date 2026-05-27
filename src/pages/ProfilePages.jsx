@@ -9,6 +9,8 @@ import { postService } from "@/services/postService";
 import PostCard from "@/components/social/PostCard";
 import { FaUserFriends } from "react-icons/fa";
 import FriendsModal from "@/components/social/FriendsModal";
+import { FaBookmark } from "react-icons/fa";
+import SavedPostsModal from "@/components/social/SavedPostsModal";
 
 const METHOD_ICONS = {
   Espresso: (
@@ -106,7 +108,7 @@ export default function ProfilePage() {
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [showFriends, setShowFriends] = useState(false);
-
+  const [showSaved, setShowSaved] = useState(false);
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
@@ -121,82 +123,113 @@ export default function ProfilePage() {
   }, [user?.id]);
 
   return (
-  <div className="profile-page">
-    <div className="profile-header-actions">
-      <button className="profile-friends-btn" onClick={() => setShowFriends(true)}>
-        <FaUserFriends size={24} />
-      </button>
-      <button className="profile-settings-btn" onClick={() => navigate("/settings")}>
-        <IoSettings size={26} />
-      </button>
-    </div>
-
-    {showFriends && <FriendsModal onClose={() => setShowFriends(false)} />}
-
-    <div className="profile-header">
-      <div className="profile-avatar-lg">
-        {profile?.avatar_url ? (
-          <img src={profile.avatar_url} alt="avatar" />
-        ) : (
-          user?.email?.charAt(0).toUpperCase()
-        )}
+    <div className="profile-page">
+      <div className="profile-header-actions">
+        <button
+          className="profile-friends-btn"
+          onClick={() => setShowFriends(true)}
+        >
+          <FaUserFriends size={24} />
+        </button>
+        <button
+          className="profile-friends-btn"
+          onClick={() => setShowSaved(true)}
+        >
+          <FaBookmark size={20} />
+        </button>
+        <button
+          className="profile-settings-btn"
+          onClick={() => navigate("/settings")}
+        >
+          <IoSettings size={26} />
+        </button>
       </div>
-      <h2 className="profile-username">{profile?.username || "Usuario"}</h2>
-      {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
-      {profile?.location && <p className="profile-location">📍 {profile.location}</p>}
-      {profile?.preferred_methods?.length > 0 && (
-        <div className="profile-section">
-          <h4 className="profile-section-title">Métodos favoritos</h4>
-          <div className="profile-chips">
-            {profile.preferred_methods.map((m) => (
-              <span key={m} className={`profile-chip method-chip ${METHOD_ICONS[m] ? "has-icon" : ""}`}>
-                <span className="method-chip-name">{m}</span>
-                {METHOD_ICONS[m] && <span className="method-chip-icon">{METHOD_ICONS[m]}</span>}
-              </span>
-            ))}
-          </div>
+
+      {showFriends && <FriendsModal onClose={() => setShowFriends(false)} />}
+      {showSaved && <SavedPostsModal onClose={() => setShowSaved(false)} />}
+
+      <div className="profile-header">
+        <div className="profile-avatar-lg">
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="avatar" />
+          ) : (
+            user?.email?.charAt(0).toUpperCase()
+          )}
         </div>
-      )}
-      <div className="profile-origins-level-row">
-        {profile?.preferred_origins?.length > 0 && (
+        <h2 className="profile-username">
+          {profile?.display_name || profile?.username || "Usuario"}
+        </h2>
+        <p className="profile-handle">@{profile?.username}</p>
+        {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
+        {profile?.location && (
+          <p className="profile-location">📍 {profile.location}</p>
+        )}
+        {profile?.preferred_methods?.length > 0 && (
           <div className="profile-section">
-            <h4 className="profile-section-title">Orígenes preferidos</h4>
-            <div className="profile-chips profile-chips-grid">
-              {profile.preferred_origins.map((o) => (
-                <span key={o} className="profile-chip">{o}</span>
+            <h4 className="profile-section-title">Métodos favoritos</h4>
+            <div className="profile-chips">
+              {profile.preferred_methods.map((m) => (
+                <span
+                  key={m}
+                  className={`profile-chip method-chip ${METHOD_ICONS[m] ? "has-icon" : ""}`}
+                >
+                  <span className="method-chip-name">{m}</span>
+                  {METHOD_ICONS[m] && (
+                    <span className="method-chip-icon">{METHOD_ICONS[m]}</span>
+                  )}
+                </span>
               ))}
             </div>
           </div>
         )}
-        {profile?.experience_level && (
-          <div className="profile-section">
-            <h4 className="profile-section-title">Nivel</h4>
-            <span className={`profile-chip profile-chip-${
-              profile.experience_level === "Casual" ? "casual"
-              : profile.experience_level === "Home Brewer" ? "brewer"
-              : "barista"
-            }`}>
-              {profile.experience_level}
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="profile-posts">
-        {loadingPosts ? (
-          <p className="profile-posts-empty">Cargando...</p>
-        ) : posts.length === 0 ? (
-          <p className="profile-posts-empty">Sin publicaciones aún</p>
-        ) : (
-          posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onDelete={(id) => setPosts((prev) => prev.filter((p) => p.id !== id))}
-            />
-          ))
-        )}
+        <div className="profile-origins-level-row">
+          {profile?.preferred_origins?.length > 0 && (
+            <div className="profile-section">
+              <h4 className="profile-section-title">Orígenes preferidos</h4>
+              <div className="profile-chips profile-chips-grid">
+                {profile.preferred_origins.map((o) => (
+                  <span key={o} className="profile-chip">
+                    {o}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {profile?.experience_level && (
+            <div className="profile-section">
+              <h4 className="profile-section-title">Nivel</h4>
+              <span
+                className={`profile-chip profile-chip-${
+                  profile.experience_level === "Casual"
+                    ? "casual"
+                    : profile.experience_level === "Home Brewer"
+                      ? "brewer"
+                      : "barista"
+                }`}
+              >
+                {profile.experience_level}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="profile-posts">
+          {loadingPosts ? (
+            <p className="profile-posts-empty">Cargando...</p>
+          ) : posts.length === 0 ? (
+            <p className="profile-posts-empty">Sin publicaciones aún</p>
+          ) : (
+            posts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                onDelete={(id) =>
+                  setPosts((prev) => prev.filter((p) => p.id !== id))
+                }
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 }

@@ -10,8 +10,19 @@
   position: relative;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-xl) 0;
+  gap: var(--spacing-md) 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+.profile-header * {
+  pointer-events: all;
+}
+
+.profile-handle {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin: 0;
 }
 
 .profile-avatar-lg {
@@ -56,8 +67,8 @@
 
 .profile-header-actions {
   position: absolute;
-  top: 4%;
-  right: calc(-2 * var(--spacing-lg));
+  top: 1.25rem;
+  right: 22px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -73,6 +84,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .profile-header-actions {
+    top: 1.25rem;
+    right: -68px;
+  }
 }
 
 .profile-friends-btn {

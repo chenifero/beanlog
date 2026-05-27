@@ -6,6 +6,7 @@ import { postService } from '@/services/postService'
 import { useAuth } from '@/context/AuthContext'
 import { FaLocationDot } from "react-icons/fa6";
 import { FaCamera } from "react-icons/fa";
+import MentionInput from '@/components/ui/MentionInput'
 import './CreatePostModal.css'
 
 export default function CreatePostModal({ onClose, onPostCreated }) {
@@ -131,7 +132,7 @@ export default function CreatePostModal({ onClose, onPostCreated }) {
             </div>
         </div>
 
-          <textarea
+          <MentionInput
             className="modal-textarea"
             placeholder="¿Qué café estás tomando? ¿Visitaste alguna cafetería?"
             value={content}
