@@ -25,10 +25,15 @@ import { FaSearch } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
+import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { ORIGENES, PROCESOS, TUESTES } from "@/utils/coffeeConstants";
 import html2canvas from "html2canvas";
 import { postService } from "@/services/postService";
 import MentionInput from "@/components/ui/MentionInput";
+import { DayPicker } from "react-day-picker";
+import { es } from "react-day-picker/locale";
+import { BsStars } from "react-icons/bs";
+import "react-day-picker/style.css";
 import "./TastingModal.css";
 
 const RADAR_ATTRIBUTES = [
@@ -63,6 +68,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
   const [precio, setPrecio] = useState("");
   const [divisa, setDivisa] = useState("€");
   const [linkCompra, setLinkCompra] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
 
   // Foto
   const [labelFile, setLabelFile] = useState(null);
@@ -378,7 +384,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   onClick={handleScanLabel}
                   disabled={!labelFile || loading}
                 >
-                  {loading ? "Escaneando..." : "Escanear IA ✨"}
+                  {loading ? "Escaneando..." : <>Escanear con IA <BsStars /></>}
                 </button>
               </div>
             </div>
@@ -729,14 +735,56 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                 </div>
 
                 {/* Fecha */}
-                <div className="tasting-field">
+                <div className="tasting-field" style={{ position: "relative" }}>
                   <label>Fecha</label>
-                  <input
-                    type="date"
-                    value={fecha}
-                    onChange={(e) => setFecha(e.target.value)}
-                    className="tasting-date"
-                  />
+                  <div
+                    className="tasting-date-wrapper"
+                    onClick={() => setShowPicker((p) => !p)}
+                  >
+                    <input
+                      type="text"
+                      readOnly
+                      value={
+                        fecha
+                          ? new Date(fecha + "T00:00:00").toLocaleDateString(
+                              "es-ES",
+                            )
+                          : ""
+                      }
+                      className="tasting-date"
+                      placeholder="Selecciona una fecha"
+                      style={{ cursor: "pointer", pointerEvents: "none" }}
+                    />
+                    <span className="tasting-date-icon">
+                      {showPicker ? <FaChevronUp /> : <FaChevronDown />}
+                    </span>
+                  </div>
+                  {showPicker && (
+                    <div className="tasting-daypicker-popup">
+                      <DayPicker
+                        locale={es}
+                        mode="single"
+                        selected={
+                          fecha ? new Date(fecha + "T00:00:00") : undefined
+                        }
+                        onSelect={(date) => {
+                          if (date) {
+                            const y = date.getFullYear();
+                            const m = String(date.getMonth() + 1).padStart(
+                              2,
+                              "0",
+                            );
+                            const d = String(date.getDate()).padStart(2, "0");
+                            setFecha(`${y}-${m}-${d}`);
+                          }
+                          setShowPicker(false);
+                        }}
+                        defaultMonth={
+                          fecha ? new Date(fecha + "T00:00:00") : new Date()
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 

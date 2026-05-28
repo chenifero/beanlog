@@ -493,3 +493,65 @@
   outline: none;
   min-width: 72px;
 }
+
+.tasting-daypicker-popup {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 100;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 8px;
+}
+
+/* Tokens de react-day-picker v9 */
+.tasting-daypicker-popup .rdp-root {
+  --rdp-accent-color: var(--amber);
+  --rdp-accent-background-color: var(--amber-subtle);
+  --rdp-background-color: var(--surface2);
+  --rdp-day-font: var(--font-sans);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.tasting-daypicker-popup .rdp-day_button {
+  border-radius: var(--radius-sm);
+}
+
+.tasting-daypicker-popup .rdp-month_caption {
+  color: var(--cream);
+  font-family: var(--font-serif);
+}
+
+.tasting-daypicker-popup .rdp-nav button {
+  color: var(--text-dim);
+}
+
+.tasting-daypicker-popup .rdp-nav button:hover {
+  color: var(--amber);
+  background: var(--amber-subtle);
+}
+
+.tasting-date-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.tasting-date-wrapper .tasting-date {
+  width: 100%;
+  padding-right: 36px;
+}
+
+.tasting-date-icon {
+  position: absolute;
+  top: 13px;
+  right: 12px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
