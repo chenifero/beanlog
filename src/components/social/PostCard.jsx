@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import { FaPaperPlane } from "react-icons/fa";
+import { FaCartShopping } from "react-icons/fa6";
 import MentionInput from "@/components/ui/MentionInput";
 import MentionText from "@/components/ui/MentionText";
 
@@ -332,6 +333,17 @@ export default function PostCard({ post, onDelete }) {
               <span className="post-tasting-score">
                 {post.tastings.puntuacion}/10
               </span>
+            )}
+            {post.tastings?.link_compra && (
+              <a
+                href={post.tastings.link_compra}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="post-buy-btn"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <FaCartShopping />
+              </a>
             )}
           </div>
         )}

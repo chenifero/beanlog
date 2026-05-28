@@ -28,7 +28,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import { ORIGENES, PROCESOS, TUESTES } from "@/utils/coffeeConstants";
 import html2canvas from "html2canvas";
 import { postService } from "@/services/postService";
-import MentionInput from '@/components/ui/MentionInput'
+import MentionInput from "@/components/ui/MentionInput";
 import "./TastingModal.css";
 
 const RADAR_ATTRIBUTES = [
@@ -61,6 +61,8 @@ export default function TastingModal({ onClose, onTastingCreated }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [precio, setPrecio] = useState("");
+  const [divisa, setDivisa] = useState("€");
+  const [linkCompra, setLinkCompra] = useState("");
 
   // Foto
   const [labelFile, setLabelFile] = useState(null);
@@ -172,7 +174,8 @@ export default function TastingModal({ onClose, onTastingCreated }) {
         notas,
         radarData,
         fecha,
-        precio,
+        precio: precio ? `${precio} ${divisa}` : null,
+        linkCompra,
         fotoUrl,
       });
 
@@ -182,7 +185,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
         cafeData.tueste ? `Tueste: ${cafeData.tueste}` : null,
         cafeData.finca ? `Finca: ${cafeData.finca}` : null,
         cafeData.sca ? `SCA: ${cafeData.sca}` : null,
-        precio ? `Precio: ${precio}` : null,
+        precio ? `Precio: ${precio} ${divisa}` : null,
         notas ? `Notas: ${notas}` : null,
         `Puntuación: ${puntuacion}/10`,
       ].filter(Boolean);
@@ -541,16 +544,38 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   )}
 
                   {/* Campo de precio — se rellena automáticamente o manualmente */}
+                  <div className="tasting-precio-wrapper">
+                    <input
+                      type="text"
+                      className="tasting-precio-input"
+                      value={precio}
+                      onChange={(e) => setPrecio(e.target.value)}
+                      placeholder="Ej: 14,00"
+                    />
+                    <select
+                      className="tasting-divisa-select"
+                      value={divisa}
+                      onChange={(e) => setDivisa(e.target.value)}
+                    >
+                      <option value="€">€ EUR</option>
+                      <option value="$">$ USD</option>
+                      <option value="£">£ GBP</option>
+                      <option value="¥">¥ JPY</option>
+                      <option value="CHF">CHF</option>
+                      <option value="kr">kr SEK</option>
+                    </select>
+                  </div>
+                  {/* Link de compra */}
                   <div
                     className="tasting-field"
                     style={{ marginTop: "var(--spacing-sm)" }}
                   >
-                    <label>Precio</label>
+                    <label>Dónde comprarlo</label>
                     <input
-                      type="text"
-                      value={precio}
-                      onChange={(e) => setPrecio(e.target.value)}
-                      placeholder="Ej: 14,00 €"
+                      type="url"
+                      value={linkCompra}
+                      onChange={(e) => setLinkCompra(e.target.value)}
+                      placeholder="https://..."
                     />
                   </div>
                 </div>

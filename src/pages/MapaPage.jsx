@@ -7,7 +7,7 @@ import { coffeeShopService } from "@/services/coffeeShopService";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { useAuth } from "@/context/AuthContext";
 import { postService } from "@/services/postService";
-import MentionInput from '@/components/ui/MentionInput'
+import MentionInput from "@/components/ui/MentionInput";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./MapaPage.css";
@@ -406,8 +406,8 @@ export default function MapaPage() {
                   placeholder="Ambiente, especialidad, horario..."
                   rows={3}
                   value={formData.notas}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, notas: e.target.value }))
+                  onChange={(text) =>
+                    setFormData((p) => ({ ...p, notas: text }))
                   }
                 />
               </div>

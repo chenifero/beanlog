@@ -26,7 +26,7 @@ function notificationText(type) {
 }
 
 export default function NotificationsPage() {
-  const { user } = useAuth()
+  const { user, clearUnreadCount } = useAuth()
   const navigate = useNavigate()
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
@@ -37,6 +37,7 @@ export default function NotificationsPage() {
         const data = await notificationService.getNotifications(user.id)
         setNotifications(data)
         await notificationService.markAllAsRead(user.id)
+        clearUnreadCount()
       } catch (err) {
         console.error(err)
       } finally {
@@ -80,7 +81,7 @@ export default function NotificationsPage() {
               }
             </div>
             <div className="notif-body">
-              <span className="notif-actor">{notif.actor?.display_name || notif.actor?.username}</span>
+              <span className="notif-actor">{notif.actor?.username}</span>
               {' '}
               <span className="notif-text">{notificationText(notif.type)}</span>
             </div>

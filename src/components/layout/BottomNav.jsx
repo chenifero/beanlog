@@ -1,28 +1,15 @@
 //navegación para móvil se muestra en la parte inferior
-import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import "./BottomNav.css";
-import { PiCoffee } from "react-icons/pi";
 import { PiCoffeeBeanFill } from "react-icons/pi";
 import { FaMap } from "react-icons/fa6";
-import { IoStatsChart } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaCoffee } from "react-icons/fa";
 import { FaBell } from "react-icons/fa";
-import { notificationService } from "@/services/notificationService";
 import { useAuth } from "@/context/AuthContext";
 
 export default function BottomNav() {
-  const { user } = useAuth();
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    if (!user?.id) return;
-    notificationService
-      .getUnreadCount(user.id)
-      .then(setUnreadCount)
-      .catch(console.error);
-  }, [user?.id]);
+  const { user, unreadCount } = useAuth()
 
   const navItems = [
     { path: "/", label: "Home", icon: <FaCoffee /> },
@@ -44,7 +31,6 @@ export default function BottomNav() {
     },
     { path: "/profile", label: "Perfil", icon: <FaUser /> },
   ];
-
 
   return (
     <nav className="bottom-nav">

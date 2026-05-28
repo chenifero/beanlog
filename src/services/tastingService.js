@@ -65,7 +65,7 @@ export const tastingService = {
       }
     }
 
-    // Crea la cata — sca va en cafes_master, no aquí
+    // Crea la cata
     const { data, error } = await supabase
       .from('tastings')
       .insert({
@@ -77,6 +77,7 @@ export const tastingService = {
         fecha: tastingData.fecha || new Date().toISOString().split('T')[0],
         precio: tastingData.precio || null,
         foto_url: tastingData.fotoUrl || null,
+        link_compra: tastingData.linkCompra || null,
       })
       .select(`
         *,

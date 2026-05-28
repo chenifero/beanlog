@@ -8,25 +8,16 @@ import Avatar from "@/components/ui/Avatar";
 import "./Sidebar.css";
 import { PiCoffeeBeanFill } from "react-icons/pi";
 import { FaMap } from "react-icons/fa6";
-import {
-  IoStatsChart,
-  IoSettings,
-  IoChevronBack,
-  IoChevronForward,
-} from "react-icons/io5";
+import { IoSettings, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { FaCoffee, FaBell } from "react-icons/fa";
-import { useState, useEffect } from "react";
-import { notificationService } from "@/services/notificationService";
 
 export default function Sidebar() {
-  const [unreadCount, setUnreadCount] = useState(0);
-  const { user, profile } = useAuth();
+  const { user, profile, unreadCount } = useAuth();
   const { isCollapsed, toggle } = useSidebar();
 
   useEffect(() => {
     if (!user?.id) return;
     notificationService
-      .getUnreadCount(user.id)
       .then(setUnreadCount)
       .catch(console.error);
   }, [user?.id]);

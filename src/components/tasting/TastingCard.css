@@ -132,3 +132,47 @@
   height: 200px;
   object-fit: cover;
 }
+
+.tasting-card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: var(--spacing-md);
+}
+
+.tasting-card-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.tasting-card-chip svg {
+  flex-shrink: 0;
+  color: var(--amber);
+}
+
+.tasting-card-buy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--amber);
+  color: white;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  text-decoration: none;
+  font-weight: 500;
+  align-self: flex-start;
+  transition: opacity var(--transition-base);
+}
+
+.tasting-card-buy-btn:hover {
+  opacity: 0.85;
+}

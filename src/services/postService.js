@@ -15,6 +15,7 @@ export const postService = {
       profiles!posts_user_id_fkey (
         id,
         username,
+        display_name,
         avatar_url,
         experience_level
       ),
@@ -23,6 +24,7 @@ export const postService = {
         puntuacion,
         notas,
         radar_data,
+        link_compra,
         cafes_master (
           nombre,
           origen,
@@ -82,6 +84,7 @@ export const postService = {
         puntuacion,
         notas,
         radar_data,
+        link_compra,
         cafes_master (
           nombre,
           origen,
@@ -128,6 +131,7 @@ export const postService = {
       profiles (
         id,
         username,
+        display_name,
         avatar_url,
         experience_level
       ),
@@ -135,6 +139,7 @@ export const postService = {
         id,
         puntuacion,
         notas,
+        link_compra,
         cafes_master (
           nombre,
           origen
@@ -201,7 +206,6 @@ export const postService = {
     } catch (e) {
       console.warn("Notificaciones no creadas:", e);
     }
-    return data;
     return data;
   },
 
@@ -292,7 +296,6 @@ export const postService = {
       } catch (e) {
         console.warn("Notificación no creada:", e);
       }
-      return true;
       return true;
     }
   },

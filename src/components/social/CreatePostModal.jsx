@@ -136,7 +136,7 @@ export default function CreatePostModal({ onClose, onPostCreated }) {
             className="modal-textarea"
             placeholder="¿Qué café estás tomando? ¿Visitaste alguna cafetería?"
             value={content}
-            onChange={e => setContent(e.target.value)}
+            onChange={setContent}
             rows={4}
             autoFocus
           />

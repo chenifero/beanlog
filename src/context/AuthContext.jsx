@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { authService } from "@/services/authService";
 import { profileService } from "@/services/profileService";
+import { notificationService } from "@/services/notificationService";
 
 const AuthContext = createContext();
 
@@ -10,6 +11,19 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const refreshUnreadCount = async (userId) => {
+    if (!userId) return;
+    try {
+      const count = await notificationService.getUnreadCount(userId);
+      setUnreadCount(count);
+    } catch (err) {
+      console.error("Error cargando notificaciones:", err);
+    }
+  };
+
+  const clearUnreadCount = () => setUnreadCount(0);
 
   // Carga el perfil desde Supabase
   const refreshProfile = async (userId) => {
@@ -20,6 +34,7 @@ export function AuthProvider({ children }) {
     } catch (err) {
       console.error("Error cargando perfil:", err);
     }
+    await refreshUnreadCount(userId);
   };
 
   useEffect(() => {
@@ -65,6 +80,8 @@ export function AuthProvider({ children }) {
     profile,
     refreshProfile,
     isAuthenticated: !!user,
+    unreadCount,
+    clearUnreadCount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
