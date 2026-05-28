@@ -207,20 +207,20 @@ export default function PostDetailPage() {
     }
   };
 
+  useEffect(() => {
+    if (!post || post.type !== "visit" || !post.coffee_shop_id) return;
+    coffeeShopStatusService
+      .getStatus(user.id, post.coffee_shop_id)
+      .then(setShopStatus)
+      .catch(console.error);
+  }, [post?.id]);
+
   if (loading) return <div className="postdetail-loading">Cargando...</div>;
   if (!post)
     return <div className="postdetail-loading">Publicación no encontrada</div>;
 
   const photos = post.image_urls || [];
   const isOwn = user.id === post.user_id;
-
-  useEffect(() => {
-    if (post.type !== "visit" || !post.coffee_shop_id) return;
-    coffeeShopStatusService
-      .getStatus(user.id, post.coffee_shop_id)
-      .then(setShopStatus)
-      .catch(console.error);
-  }, [post.id]);
 
   const handleShopStatus = async (status) => {
     try {
