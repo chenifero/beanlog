@@ -17,6 +17,8 @@ import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import { FaPaperPlane } from "react-icons/fa";
 import { FaCartShopping } from "react-icons/fa6";
+import { coffeeShopStatusService } from "@/services/coffeeShopStatusService";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import MentionInput from "@/components/ui/MentionInput";
 import MentionText from "@/components/ui/MentionText";
 
@@ -134,6 +136,7 @@ export default function PostCard({ post, onDelete }) {
   const [newComment, setNewComment] = useState("");
   const [currentPhoto, setCurrentPhoto] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
+  const [shopStatus, setShopStatus] = useState(null);
 
   const isOwner = user?.id === post.user_id;
   const photos = post.image_urls || [];
@@ -206,6 +209,27 @@ export default function PostCard({ post, onDelete }) {
     };
     loadLikes();
   }, [post.id]);
+
+  useEffect(() => {
+    if (post.type !== "visit" || !post.coffee_shop_id) return;
+    coffeeShopStatusService
+      .getStatus(user.id, post.coffee_shop_id)
+      .then(setShopStatus)
+      .catch(console.error);
+  }, [post.id]);
+
+  const handleShopStatus = async (status) => {
+    try {
+      const result = await coffeeShopStatusService.setStatus(
+        user.id,
+        post.coffee_shop_id,
+        status,
+      );
+      setShopStatus(result);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <article className="post-card">
@@ -314,6 +338,29 @@ export default function PostCard({ post, onDelete }) {
             {post.rating && (
               <span className="post-tasting-score">{post.rating}/10</span>
             )}
+          </div>
+        )}
+        {/* Botones de visitada y quiero ir */}
+        {post.type === "visit" && post.coffee_shop_id && (
+          <div className="post-shop-actions">
+            <button
+              className={`post-shop-btn want-to-go ${shopStatus === "want_to_go" ? "active" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShopStatus("want_to_go");
+              }}
+            >
+              <FaMapMarkerAlt /> Quiero ir
+            </button>
+            <button
+              className={`post-shop-btn visited ${shopStatus === "visited" ? "active" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShopStatus("visited");
+              }}
+            >
+              ✓ Visitada
+            </button>
           </div>
         )}
 

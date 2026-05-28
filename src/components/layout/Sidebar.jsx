@@ -15,13 +15,6 @@ export default function Sidebar() {
   const { user, profile, unreadCount } = useAuth();
   const { isCollapsed, toggle } = useSidebar();
 
-  useEffect(() => {
-    if (!user?.id) return;
-    notificationService
-      .then(setUnreadCount)
-      .catch(console.error);
-  }, [user?.id]);
-
   const navItems = [
     { path: "/", label: "Home", icon: <FaCoffee /> },
     { path: "/cafes", label: "Mis Cafés", icon: <PiCoffeeBeanFill /> },

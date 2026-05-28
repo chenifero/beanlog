@@ -11,6 +11,8 @@ import { FaPaperPlane } from "react-icons/fa";
 import { savedPostsService } from "@/services/savedPostsService";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { FaComment } from "react-icons/fa";
+import { coffeeShopStatusService } from "@/services/coffeeShopStatusService";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import MentionInput from "@/components/ui/MentionInput";
 import MentionText from "@/components/ui/MentionText";
 import "./PostDetailPage.css";
@@ -114,6 +116,7 @@ export default function PostDetailPage() {
   const { postId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [shopStatus, setShopStatus] = useState(null);
 
   const handleSave = async () => {
     setSaveLoading(true);
@@ -210,6 +213,27 @@ export default function PostDetailPage() {
 
   const photos = post.image_urls || [];
   const isOwn = user.id === post.user_id;
+
+  useEffect(() => {
+    if (post.type !== "visit" || !post.coffee_shop_id) return;
+    coffeeShopStatusService
+      .getStatus(user.id, post.coffee_shop_id)
+      .then(setShopStatus)
+      .catch(console.error);
+  }, [post.id]);
+
+  const handleShopStatus = async (status) => {
+    try {
+      const result = await coffeeShopStatusService.setStatus(
+        user.id,
+        post.coffee_shop_id,
+        status,
+      );
+      setShopStatus(result);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="postdetail-page">
@@ -351,6 +375,30 @@ export default function PostDetailPage() {
             {post.rating && (
               <span className="postdetail-tasting-score">{post.rating}/10</span>
             )}
+          </div>
+        )}
+
+        {/* Botones quiero ir / visitada para visitas con cafetería */}
+        {post.type === "visit" && post.coffee_shop_id && (
+          <div className="post-shop-actions">
+            <button
+              className={`post-shop-btn want-to-go ${shopStatus === "want_to_go" ? "active" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShopStatus("want_to_go");
+              }}
+            >
+              <FaMapMarkerAlt /> Quiero ir
+            </button>
+            <button
+              className={`post-shop-btn visited ${shopStatus === "visited" ? "active" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShopStatus("visited");
+              }}
+            >
+              ✓ Visitada
+            </button>
           </div>
         )}
 

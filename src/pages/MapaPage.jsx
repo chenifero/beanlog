@@ -11,33 +11,31 @@ import MentionInput from "@/components/ui/MentionInput";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./MapaPage.css";
+import { FaChair } from "react-icons/fa";
+import { FaChevronRight } from "react-icons/fa6";
+import { coffeeShopStatusService } from "@/services/coffeeShopStatusService";
 
-// Icono SVG para los marcadores
-const markerIcon = L.divIcon({
-  html: `
-    <div style="
-      width:40px; height:50px;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:flex-start;
-    ">
-      <div style="
-        width:36px; height:36px;
-        background:#c349ee;
-        border-radius:50% 50% 50% 0;
-        transform:rotate(-45deg);
-        display:flex; align-items:center; justify-content:center;
-        box-shadow:0 2px 8px rgba(0,0,0,0.3);
-      ">
-        <svg style="transform:rotate(45deg)" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 640 512" fill="white">
-          <path d="M192 384h192c53 0 96-43 96-96h32c70.6 0 128-57.4 128-128S582.6 32 512 32H120c-13.3 0-24 10.7-24 24v232c0 53 43 96 96 96zM512 96c35.3 0 64 28.7 64 64s-28.7 64-64 64h-32V96h32zm47.7 384H48.3c-47.6 0-61-64-36-64h583.4c25 0 11.8 64-36 64z"/>
-        </svg>
-      </div>
-    </div>
-  `,
-  className: "",
-  iconSize: [40, 50],
-  iconAnchor: [20, 46],
-});
+function createMarkerIcon(color = "#c349ee") {
+  return L.divIcon({
+    html: `
+      <div style="width:40px;height:50px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;">
+        <div style="width:36px;height:36px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);">
+          <svg style="transform:rotate(45deg)" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 640 512" fill="white">
+            <path d="M192 384h192c53 0 96-43 96-96h32c70.6 0 128-57.4 128-128S582.6 32 512 32H120c-13.3 0-24 10.7-24 24v232c0 53 43 96 96 96zM512 96c35.3 0 64 28.7 64 64s-28.7 64-64 64h-32V96h32zm47.7 384H48.3c-47.6 0-61-64-36-64h583.4c25 0 11.8 64-36 64z"/>
+          </svg>
+        </div>
+      </div>`,
+    className: "",
+    iconSize: [40, 50],
+    iconAnchor: [20, 46],
+  });
+}
+
+const STATUS_COLORS = {
+  want_to_go: "#4A90D9",
+  visited: "#52C97A",
+  default: "#c349ee",
+};
 
 function FlyTo({ center, zoom }) {
   const map = useMap();
@@ -103,6 +101,23 @@ export default function MapaPage() {
   const [fotoFiles, setFotoFiles] = useState([]);
   const [fotoPreviews, setFotoPreviews] = useState([]);
 
+  const [userStatuses, setUserStatuses] = useState({});
+  const [activeFilters, setActiveFilters] = useState([
+    "default",
+    "want_to_go",
+    "visited",
+  ]);
+
+  const toggleFilter = (filter) => {
+    setActiveFilters((prev) =>
+      prev.includes(filter)
+        ? prev.length === 1
+          ? prev
+          : prev.filter((f) => f !== filter)
+        : [...prev, filter],
+    );
+  };
+
   // Form de nueva cafetería
   const [formData, setFormData] = useState({
     nombre: "",
@@ -123,6 +138,8 @@ export default function MapaPage() {
     try {
       const data = await coffeeShopService.getCoffeeShops();
       setCoffeeShops(data);
+      const statuses = await coffeeShopStatusService.getUserStatuses(user.id);
+      setUserStatuses(statuses);
     } catch (err) {
       console.error("Error cargando cafeterías:", err);
     } finally {
@@ -288,15 +305,39 @@ export default function MapaPage() {
         />
         <LocateUser />
         {flyTo && <FlyTo center={flyTo} zoom={14} />}
-        {coffeeShops.map((shop) => (
-          <Marker
-            key={shop.id}
-            position={[shop.lat, shop.lng]}
-            icon={markerIcon}
-            eventHandlers={{ click: () => setSelectedShop(shop) }}
-          />
-        ))}
+        {coffeeShops
+          .filter((shop) => {
+            const status = userStatuses[shop.id] || "default";
+            return activeFilters.includes(status);
+          })
+          .map((shop) => (
+            <Marker
+              key={shop.id}
+              position={[shop.lat, shop.lng]}
+              icon={createMarkerIcon(
+                STATUS_COLORS[userStatuses[shop.id]] || STATUS_COLORS.default,
+              )}
+              eventHandlers={{ click: () => setSelectedShop(shop) }}
+            />
+          ))}
       </MapContainer>
+
+      <div className="mapa-leyenda">
+        {[
+          { key: "default", color: "#c349ee", label: "Mis cafeterías" },
+          { key: "want_to_go", color: "#4A90D9", label: "Quiero ir" },
+          { key: "visited", color: "#52C97A", label: "Visitada" },
+        ].map(({ key, color, label }) => (
+          <span
+            key={key}
+            className={`mapa-leyenda-item ${activeFilters.includes(key) ? "active" : "inactive"}`}
+            onClick={() => toggleFilter(key)}
+          >
+            <span className="mapa-leyenda-dot" style={{ background: color }} />
+            {label}
+          </span>
+        ))}
+      </div>
 
       {/* Botón añadir cafetería */}
       <button className="mapa-add-btn" onClick={() => setShowModal(true)}>
@@ -470,7 +511,7 @@ export default function MapaPage() {
             className="mapa-detail-maps-btn"
             onClick={() => openInMaps(selectedShop)}
           >
-            Abrir en Maps →
+            Abrir en Maps <FaChevronRight />
           </button>
         </div>
       )}
