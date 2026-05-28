@@ -44,7 +44,7 @@ export default function Sidebar() {
         {/* Solo muestra el logo completo cuando está expandida */}
         {!isCollapsed && (
           <img
-            src="logos/logo_header_slogan.png"
+            src="/logos/logo_header_slogan.png"
             alt="BeanLog"
             className="sidebar-logo-img"
           />

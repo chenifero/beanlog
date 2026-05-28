@@ -63,7 +63,7 @@ export default function LoginPage() {
       <div className="auth-page">
         <div className="auth-container">
           <h1>Recuperar contraseña</h1>
-          <img src="logos/logo_header_slogan.png" alt="BeanLog Logo" className="auth-logo" />
+          <img src="/logos/logo_header_slogan.png" alt="BeanLog Logo" className="auth-logo" />
 
           {resetSent ? (
             <div className="auth-success">
@@ -103,7 +103,7 @@ export default function LoginPage() {
     <div className="auth-page">
       <div className="auth-container">
         <h1>Inicia sesión en</h1>
-        <img src="logos/logo_header_slogan.png" alt="BeanLog Logo" className="auth-logo" />
+        <img src="/logos/logo_header_slogan.png" alt="BeanLog Logo" className="auth-logo" />
 
         {error && <div className="auth-error">{error}</div>}
 

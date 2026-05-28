@@ -54,7 +54,7 @@ export default function RegisterPage() {
       <div className="auth-container">
         <h1>Únete a BeanLog</h1>
         <img
-          src="logos/logo_header_slogan.png"
+          src="/logos/logo_header_slogan.png"
           alt="BeanLog Logo"
           className="auth-logo"
         />
