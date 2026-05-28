@@ -336,7 +336,7 @@
 /* Input fijo abajo */
 .postdetail-comment-bar {
   position: fixed;
-  bottom: 64px;
+  bottom: 64px; /* móvil: encima de la bottom nav */
   left: 0;
   right: 0;
   max-width: 600px;
@@ -347,6 +347,20 @@
   background: var(--bg);
   border-top: 1px solid var(--border);
   z-index: 100;
+}
+
+@media (min-width: 768px) {
+  .postdetail-comment-bar {
+    left: 220px;
+    right: 0;
+    bottom: 0;
+    max-width: none;
+    margin: 0;
+  }
+
+  .app-shell.sidebar-collapsed .postdetail-comment-bar {
+    left: 60px;
+  }
 }
 
 .postdetail-comment-input {
