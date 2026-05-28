@@ -1,7 +1,6 @@
+/* PostDetailPage.css */
 .postdetail-page {
-  max-width: 600px;
-  margin: 0 auto;
-  padding-bottom: 80px;
+  padding: var(--spacing-lg) var(--spacing-md) 80px;
   position: relative;
 }
 
