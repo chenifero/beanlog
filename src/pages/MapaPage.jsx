@@ -32,7 +32,7 @@ function createMarkerIcon(color = "#c349ee") {
 }
 
 const STATUS_COLORS = {
-  want_to_go: "#4A90D9",
+  want_to_go: "#F5A623",
   visited: "#52C97A",
   default: "#c349ee",
 };
@@ -325,7 +325,7 @@ export default function MapaPage() {
       <div className="mapa-leyenda">
         {[
           { key: "default", color: "#c349ee", label: "Mis cafeterías" },
-          { key: "want_to_go", color: "#4A90D9", label: "Quiero ir" },
+          { key: "want_to_go", color: "#F5A623", label: "Quiero ir" },
           { key: "visited", color: "#52C97A", label: "Visitada" },
         ].map(({ key, color, label }) => (
           <span
