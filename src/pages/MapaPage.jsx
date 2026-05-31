@@ -34,7 +34,7 @@ function createMarkerIcon(color = "#c349ee") {
 const STATUS_COLORS = {
   want_to_go: "#F5A623",
   visited: "#52C97A",
-  default: "#c349ee",
+  default: "#c349ee"
 };
 
 function FlyTo({ center, zoom }) {
