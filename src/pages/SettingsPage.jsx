@@ -214,18 +214,23 @@ export default function SettingsPage() {
     const timer = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://photon.komoot.io/api/?q=${encodeURIComponent(location)}&limit=5`,
+          `https://photon.komoot.io/api/?q=${encodeURIComponent(location)}&limit=7&layer=house&layer=street&layer=locality&layer=city`,
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const suggestions = (data.features || []).map((f) => {
           const p = f.properties;
-          const parts = [
-            p.name,
-            p.city !== p.name ? p.city : null,
-            p.country,
-          ].filter(Boolean);
-          return parts.join(", ");
+          let name = p.name;
+          if (p.type === "house") {
+            name =
+              p.street && p.housenumber
+                ? `${p.street} ${p.housenumber}`
+                : p.street || p.name;
+          }
+          const parts = [name];
+          if (p.city && p.city !== name) parts.push(p.city);
+          if (p.country) parts.push(p.country);
+          return parts.filter(Boolean).join(", ");
         });
         setLocationSuggestions(suggestions);
         setShowSuggestions(suggestions.length > 0);

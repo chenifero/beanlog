@@ -169,22 +169,29 @@ export default function MapaPage() {
     const timer = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://photon.komoot.io/api/?q=${encodeURIComponent(formData.location)}&limit=5`,
+          `https://photon.komoot.io/api/?q=${encodeURIComponent(formData.location)}&limit=7&layer=house&layer=street&layer=locality&layer=city`,
         );
         const data = await res.json();
-        const suggestions = (data.features || []).map((f) => ({
-          label: [
-            f.properties.name,
-            f.properties.city !== f.properties.name ? f.properties.city : null,
-            f.properties.country,
-          ]
-            .filter(Boolean)
-            .join(", "),
-          lat: f.geometry.coordinates[1],
-          lng: f.geometry.coordinates[0],
-          ciudad: f.properties.city || f.properties.name,
-          pais: f.properties.country,
-        }));
+        const suggestions = (data.features || []).map((f) => {
+          const p = f.properties;
+          let name = p.name;
+          if (p.type === "house") {
+            name =
+              p.street && p.housenumber
+                ? `${p.street} ${p.housenumber}`
+                : p.street || p.name;
+          }
+          const parts = [name];
+          if (p.city && p.city !== name) parts.push(p.city);
+          if (p.country) parts.push(p.country);
+          return {
+            label: parts.filter(Boolean).join(", "),
+            lat: f.geometry.coordinates[1],
+            lng: f.geometry.coordinates[0],
+            ciudad: p.city || p.name,
+            pais: p.country,
+          };
+        });
         setLocationSuggestions(suggestions);
         setShowSuggestions(suggestions.length > 0);
       } catch (err) {
