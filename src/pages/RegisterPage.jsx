@@ -80,6 +80,7 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={loading}
+            showToggle
           />
 
           <Input
@@ -90,6 +91,7 @@ export default function RegisterPage() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
             disabled={loading}
+            showToggle
           />
 
           <Button

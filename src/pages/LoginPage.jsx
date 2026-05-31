@@ -125,6 +125,7 @@ export default function LoginPage() {
             onChange={e => setPassword(e.target.value)}
             required
             disabled={loading}
+            showToggle
           />
           <button
             type="button"
