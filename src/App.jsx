@@ -40,6 +40,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route
         path="/*"
         element={
@@ -52,7 +53,6 @@ function AppRoutes() {
                 <Route path="/cafes" element={<MisCafesPage />} />
                 <Route path="/map" element={<MapaPage />} />
                 <Route path="/user/:username" element={<UserProfilePage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/post/:postId" element={<PostDetailPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />

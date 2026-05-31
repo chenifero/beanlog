@@ -17,12 +17,16 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // PASSWORD_RECOVERY fires when Supabase processes the URL hash — often
+    // before this component mounts, so we also check the existing session.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setValidSession(true);
+    });
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setValidSession(true);
-      }
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setValidSession(true);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -40,8 +44,9 @@ export default function ResetPasswordPage() {
     setError("");
     try {
       await authService.updatePassword(password);
-      setMessage("✅ Contraseña actualizada");
-      setTimeout(() => navigate("/"), 2000);
+      setMessage("✅ Contraseña actualizada. Redirigiendo al inicio de sesión...");
+      await supabase.auth.signOut();
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       setError("❌ " + (err.message || "Error al actualizar"));
     } finally {
