@@ -45,6 +45,11 @@ export function AuthProvider({ children }) {
         if (currentSession) {
           const currentUser = await authService.getCurrentUser();
           setUser(currentUser);
+          try {
+            await profileService.ensureProfile(currentUser);
+          } catch (err) {
+            console.error("Error garantizando perfil:", err);
+          }
           await refreshProfile(currentUser.id);
         }
       } catch (err) {
@@ -56,11 +61,20 @@ export function AuthProvider({ children }) {
 
     initAuth();
 
-    const subscription = authService.onAuthStateChange((event, session) => {
+    const subscription = authService.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) refreshProfile(session.user.id);
-      // añadir esto:
+      if (session?.user) {
+        // Garantiza que existe la fila en profiles (cubre email/pass y OAuth)
+        if (event === "SIGNED_IN") {
+          try {
+            await profileService.ensureProfile(session.user);
+          } catch (err) {
+            console.error("Error creando perfil:", err);
+          }
+        }
+        await refreshProfile(session.user.id);
+      }
       if (event === "USER_UPDATED") {
         setUser(session?.user ?? null);
       }

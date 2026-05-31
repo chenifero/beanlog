@@ -4,6 +4,28 @@ import { supabase } from "./supabase";
 
 // Obtiene el perfil completo del usuario por su ID
 export const profileService = {
+  // Crea el perfil si no existe — seguro llamarlo siempre (upsert con ignore en conflicto)
+  async ensureProfile(user) {
+    const emailPrefix = (user.email || "")
+      .split("@")[0]
+      .replace(/[^a-zA-Z0-9_]/g, "")
+      .slice(0, 20);
+    const username = emailPrefix
+      ? `${emailPrefix}_${Math.random().toString(36).slice(2, 6)}`
+      : `user_${Math.random().toString(36).slice(2, 8)}`;
+
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        id: user.id,
+        username,
+        avatar_url: user.user_metadata?.avatar_url || null,
+        created_at: new Date().toISOString(),
+      },
+      { onConflict: "id", ignoreDuplicates: true },
+    );
+    if (error) throw error;
+  },
+
   async getProfile(userId) {
     const { data, error } = await supabase
       .from("profiles")

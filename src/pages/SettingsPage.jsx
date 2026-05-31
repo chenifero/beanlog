@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
 import { profileService } from "@/services/profileService";
+import { supabase } from "@/services/supabase";
 import { IoSettings } from "react-icons/io5";
 import "./SettingsPage.css";
 import { FaUser, FaLock, FaCoffee, FaPalette, FaKey } from "react-icons/fa";
@@ -171,6 +172,12 @@ export default function SettingsPage() {
   const [newEmail, setNewEmail] = useState("");
   const [savingEmail, setSavingEmail] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+
+  // Eliminar cuenta
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   // Autocomplete de ubicación con Photon
   const [locationSuggestions, setLocationSuggestions] = useState([]);
@@ -356,6 +363,21 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     await authService.signOut();
     navigate("/login");
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== "ELIMINAR") return;
+    setDeletingAccount(true);
+    setDeleteError("");
+    try {
+      const { error } = await supabase.rpc("delete_user");
+      if (error) throw error;
+      await authService.signOut();
+      navigate("/login");
+    } catch (err) {
+      setDeleteError("Error al eliminar la cuenta. Inténtalo de nuevo.");
+      setDeletingAccount(false);
+    }
   };
 
   if (loading) return <div className="settings-loading">Cargando...</div>;
@@ -724,7 +746,56 @@ export default function SettingsPage() {
             <button className="settings-btn-logout" onClick={handleLogout}>
               Cerrar sesión
             </button>
-            <button className="settings-btn-danger">Eliminar cuenta</button>
+
+            {!showDeleteConfirm ? (
+              <button
+                className="settings-btn-danger"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                Eliminar cuenta
+              </button>
+            ) : (
+              <div className="settings-delete-confirm">
+                <p className="settings-delete-warning">
+                  ⚠️ Esta acción es <strong>irreversible</strong>. Se borrarán
+                  tu perfil, publicaciones, catas y todos tus datos.
+                </p>
+                <p className="settings-delete-label">
+                  Escribe <strong>ELIMINAR</strong> para confirmar:
+                </p>
+                <input
+                  className="settings-delete-input"
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="ELIMINAR"
+                  autoComplete="off"
+                />
+                {deleteError && (
+                  <p className="settings-delete-error">{deleteError}</p>
+                )}
+                <div className="settings-delete-actions">
+                  <button
+                    className="settings-btn-secondary"
+                    onClick={() => {
+                      setShowDeleteConfirm(false);
+                      setDeleteConfirmText("");
+                      setDeleteError("");
+                    }}
+                    disabled={deletingAccount}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className="settings-btn-danger"
+                    onClick={handleDeleteAccount}
+                    disabled={deleteConfirmText !== "ELIMINAR" || deletingAccount}
+                  >
+                    {deletingAccount ? "Eliminando..." : "Eliminar mi cuenta"}
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
         )}
       </div>
