@@ -115,7 +115,7 @@ user_coffee_shop_status → estado por usuario en cada cafetería (want_to_go | 
 - Mapa Leaflet con tile CartoDB Voyager
 - Marcadores SVG con color según estado del usuario:
   - 🟣 Por defecto (`#c349ee`)
-  - 🔵 Quiero ir (`#4A90D9`)
+  - 🟡 Quiero ir (`#F5A623`)
   - 🟢 Visitada (`#52C97A`)
 - Carrusel de fotos (hasta 5) en el panel de detalle
 - Leyenda interactiva para filtrar marcadores por tipo
