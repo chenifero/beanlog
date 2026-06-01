@@ -2,7 +2,7 @@
 // Muestra las cafeterías en un mapa de Mapbox
 // El usuario puede añadir nuevas cafeterías
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { coffeeShopService } from "@/services/coffeeShopService";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { useAuth } from "@/context/AuthContext";
@@ -30,6 +30,17 @@ function createMarkerIcon(color = "#c349ee") {
     iconAnchor: [20, 46],
   });
 }
+
+const searchPinIcon = L.divIcon({
+  html: `
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <div style="width:18px;height:18px;background:#fff;border:3px solid var(--amber,#f59e0b);border-radius:50%;box-shadow:0 0 0 4px rgba(245,158,11,0.25),0 2px 8px rgba(0,0,0,0.25);"></div>
+      <div style="width:2px;height:12px;background:var(--amber,#f59e0b);margin-top:-1px;"></div>
+    </div>`,
+  className: "",
+  iconSize: [18, 32],
+  iconAnchor: [9, 32],
+});
 
 const STATUS_COLORS = {
   want_to_go: "#F5A623",
@@ -97,6 +108,13 @@ export default function MapaPage() {
   const [flyTo, setFlyTo] = useState(null);
   const { user } = useAuth();
 
+  // Buscador del mapa
+  const [mapQuery, setMapQuery] = useState("");
+  const [mapSuggestions, setMapSuggestions] = useState([]);
+  const [showMapSuggestions, setShowMapSuggestions] = useState(false);
+  const [searchedLocation, setSearchedLocation] = useState(null);
+  const skipMapFetch = useRef(false);
+
   // Foto de la cafetería
   const [fotoFiles, setFotoFiles] = useState([]);
   const [fotoPreviews, setFotoPreviews] = useState([]);
@@ -133,6 +151,102 @@ export default function MapaPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  // Autocomplete del buscador del mapa
+  useEffect(() => {
+    if (skipMapFetch.current) {
+      skipMapFetch.current = false;
+      return;
+    }
+    if (mapQuery.length < 2) {
+      setMapSuggestions([]);
+      setShowMapSuggestions(false);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://photon.komoot.io/api/?q=${encodeURIComponent(mapQuery)}&limit=5&layer=house&layer=street&layer=locality&layer=city`,
+        );
+        const data = await res.json();
+        const suggestions = (data.features || []).map((f) => {
+          const p = f.properties;
+          let name = p.name;
+          if (p.type === "house") {
+            name =
+              p.street && p.housenumber
+                ? `${p.street} ${p.housenumber}`
+                : p.street || p.name;
+          }
+          const parts = [name];
+          if (p.city && p.city !== name) parts.push(p.city);
+          if (p.country) parts.push(p.country);
+          return {
+            label: parts.filter(Boolean).join(", "),
+            lat: f.geometry.coordinates[1],
+            lng: f.geometry.coordinates[0],
+            ciudad: p.city || p.name,
+            pais: p.country,
+          };
+        });
+        setMapSuggestions(suggestions);
+        setShowMapSuggestions(suggestions.length > 0);
+      } catch (err) {
+        console.error("[Photon mapa]", err);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [mapQuery]);
+
+  const handleMapSelectLocation = (suggestion) => {
+    skipMapFetch.current = true;
+    setSearchedLocation(suggestion);
+    setFlyTo([suggestion.lat, suggestion.lng]);
+    setMapQuery(suggestion.label);
+    setShowMapSuggestions(false);
+    setMapSuggestions([]);
+  };
+
+  const handleMapSearch = async () => {
+    if (!mapQuery.trim()) return;
+    if (mapSuggestions.length > 0) {
+      handleMapSelectLocation(mapSuggestions[0]);
+      return;
+    }
+    try {
+      const res = await fetch(
+        `https://photon.komoot.io/api/?q=${encodeURIComponent(mapQuery)}&limit=1`,
+      );
+      const data = await res.json();
+      if (data.features?.length > 0) {
+        const f = data.features[0];
+        const p = f.properties;
+        handleMapSelectLocation({
+          label: [p.name, p.city, p.country].filter(Boolean).join(", "),
+          lat: f.geometry.coordinates[1],
+          lng: f.geometry.coordinates[0],
+          ciudad: p.city || p.name,
+          pais: p.country,
+        });
+      }
+    } catch (err) {
+      console.error("[Photon mapa]", err);
+    }
+  };
+
+  const handleOpenModal = () => {
+    if (searchedLocation) {
+      setFormData((p) => ({
+        ...p,
+        location: searchedLocation.label,
+        lat: searchedLocation.lat,
+        lng: searchedLocation.lng,
+        ciudad: searchedLocation.ciudad,
+        pais: searchedLocation.pais,
+      }));
+    }
+    setShowModal(true);
+  };
 
   const loadCoffeeShops = async () => {
     try {
@@ -266,6 +380,8 @@ export default function MapaPage() {
       setShowModal(false);
       setFotoFiles([]);
       setFotoPreviews([]);
+      setSearchedLocation(null);
+      setMapQuery("");
       setFormData({
         nombre: "",
         valoracion: "",
@@ -312,6 +428,12 @@ export default function MapaPage() {
         />
         <LocateUser />
         {flyTo && <FlyTo center={flyTo} zoom={14} />}
+        {searchedLocation && (
+          <Marker
+            position={[searchedLocation.lat, searchedLocation.lng]}
+            icon={searchPinIcon}
+          />
+        )}
         {coffeeShops
           .filter((shop) => {
             const status = userStatuses[shop.id] || "default";
@@ -346,9 +468,46 @@ export default function MapaPage() {
         ))}
       </div>
 
+      {/* Buscador de dirección */}
+      <div className="mapa-searchbar">
+        <input
+          type="text"
+          value={mapQuery}
+          onChange={(e) => setMapQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleMapSearch()}
+          onBlur={() => setTimeout(() => setShowMapSuggestions(false), 150)}
+          placeholder="Buscar dirección..."
+        />
+        {mapQuery && (
+          <button
+            className="mapa-searchbar-clear"
+            onClick={() => {
+              setMapQuery("");
+              setSearchedLocation(null);
+              setMapSuggestions([]);
+              setShowMapSuggestions(false);
+            }}
+          >
+            ✕
+          </button>
+        )}
+        <button className="mapa-searchbar-btn" onClick={handleMapSearch}>
+          <FaChevronRight size={14} />
+        </button>
+        {showMapSuggestions && mapSuggestions.length > 0 && (
+          <ul className="mapa-searchbar-suggestions">
+            {mapSuggestions.map((s, i) => (
+              <li key={i} onMouseDown={() => handleMapSelectLocation(s)}>
+                📍 {s.label}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       {/* Botón añadir cafetería */}
-      <button className="mapa-add-btn" onClick={() => setShowModal(true)}>
-        + Añadir cafetería
+      <button className="mapa-add-btn" onClick={handleOpenModal}>
+        + {searchedLocation ? "Añadir aquí" : "Añadir cafetería"}
       </button>
 
       {/* Modal de nueva cafetería */}

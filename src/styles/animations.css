@@ -181,6 +181,84 @@
   border-radius: var(--radius-sm);
 }
 
+/* Driver.js — overrides para el design system de BeanLog */
+.driver-popover {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
+  color: var(--text) !important;
+  font-family: var(--font-sans) !important;
+  min-width: 280px !important;
+  max-width: 340px !important;
+}
+
+.driver-popover * {
+  font-family: var(--font-sans) !important;
+}
+
+.driver-popover-title {
+  font-family: var(--font-serif) !important;
+  color: var(--cream) !important;
+  font-size: 1.05rem !important;
+}
+
+.driver-popover-description {
+  color: var(--text) !important;
+  font-size: 0.88rem !important;
+  line-height: 1.55 !important;
+}
+
+.driver-popover-footer button {
+  border: 1px solid var(--border) !important;
+  background-color: var(--surface2) !important;
+  color: var(--text) !important;
+  border-radius: 6px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.82rem !important;
+  padding: 5px 10px !important;
+  text-shadow: none !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.driver-popover-footer button:hover,
+.driver-popover-footer button:focus {
+  background-color: var(--amber-subtle) !important;
+  border-color: var(--amber) !important;
+  color: var(--amber) !important;
+}
+
+.driver-popover-footer .driver-popover-next-btn {
+  background-color: var(--amber) !important;
+  border-color: var(--amber) !important;
+  color: white !important;
+}
+
+.driver-popover-footer .driver-popover-next-btn:hover,
+.driver-popover-footer .driver-popover-next-btn:focus {
+  background-color: var(--amber-soft) !important;
+  border-color: var(--amber-soft) !important;
+  color: white !important;
+}
+
+.driver-popover-progress-text {
+  color: var(--muted) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.driver-popover-close-btn {
+  color: var(--muted) !important;
+}
+
+.driver-popover-close-btn:hover,
+.driver-popover-close-btn:focus {
+  color: var(--text) !important;
+}
+
+.driver-popover-arrow {
+  border-color: var(--surface) !important;
+}
+
 /* Disable animations for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,

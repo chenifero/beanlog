@@ -61,6 +61,18 @@ export const profileService = {
     return data;
   },
 
+  // Devuelve true si el username está disponible (no existe o pertenece al propio usuario)
+  async checkUsernameAvailable(username, currentUserId) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('username', username)
+      .maybeSingle()
+
+    if (!data) return true           // no existe → disponible
+    return data.id === currentUserId // existe pero es el propio usuario → disponible
+  },
+
   //Obtiene perfil por username para mostrar perfiles públicos
   async getProfileByUsername(username) {
     const { data, error } = await supabase

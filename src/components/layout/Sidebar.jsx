@@ -16,12 +16,13 @@ export default function Sidebar() {
   const { isCollapsed, toggle } = useSidebar();
 
   const navItems = [
-    { path: "/", label: "Home", icon: <FaCoffee /> },
-    { path: "/cafes", label: "Mis Cafés", icon: <PiCoffeeBeanFill /> },
-    { path: "/map", label: "Mapa", icon: <FaMap /> },
+    { path: "/", label: "Home", icon: <FaCoffee />, id: "nav-home" },
+    { path: "/cafes", label: "Mis Cafés", icon: <PiCoffeeBeanFill />, id: "nav-cafes" },
+    { path: "/map", label: "Mapa", icon: <FaMap />, id: "nav-map" },
     {
       path: "/notifications",
       label: "Avisos",
+      id: "nav-notifications",
       icon: (
         <div style={{ position: "relative", display: "inline-flex" }}>
           <FaBell />
@@ -33,7 +34,7 @@ export default function Sidebar() {
         </div>
       ),
     },
-    { path: "/settings", label: "Ajustes", icon: <IoSettings /> },
+    { path: "/settings", label: "Ajustes", icon: <IoSettings />, id: "nav-settings" },
   ];
 
   return (
@@ -63,9 +64,9 @@ export default function Sidebar() {
         {navItems.map((item) => (
           <NavLink
             key={item.path}
+            id={item.id}
             to={item.path}
             className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
-            // Cuando está colapsada, el título del navegador muestra el label al hacer hover
             title={isCollapsed ? item.label : ""}
           >
             <span className="nav-icon">{item.icon}</span>

@@ -12,12 +12,13 @@ export default function BottomNav() {
   const { user, unreadCount } = useAuth()
 
   const navItems = [
-    { path: "/", label: "Home", icon: <FaCoffee /> },
-    { path: "/cafes", label: "Cafés", icon: <PiCoffeeBeanFill /> },
-    { path: "/map", label: "Mapa", icon: <FaMap /> },
+    { path: "/", label: "Home", icon: <FaCoffee />, id: "nav-home" },
+    { path: "/cafes", label: "Cafés", icon: <PiCoffeeBeanFill />, id: "nav-cafes" },
+    { path: "/map", label: "Mapa", icon: <FaMap />, id: "nav-map" },
     {
       path: "/notifications",
       label: "Notificaciones",
+      id: "nav-notifications",
       icon: (
         <div style={{ position: "relative", display: "inline-flex" }}>
           <FaBell />
@@ -29,7 +30,7 @@ export default function BottomNav() {
         </div>
       ),
     },
-    { path: "/profile", label: "Perfil", icon: <FaUser /> },
+    { path: "/profile", label: "Perfil", icon: <FaUser />, id: "nav-profile" },
   ];
 
   return (
@@ -37,6 +38,7 @@ export default function BottomNav() {
       {navItems.map((item) => (
         <NavLink
           key={item.path}
+          id={item.id}
           to={item.path}
           className={({ isActive }) =>
             `bottom-nav-item ${isActive ? "active" : ""}`

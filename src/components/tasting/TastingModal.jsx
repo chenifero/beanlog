@@ -17,7 +17,7 @@ import {
   Radar,
   ResponsiveContainer,
 } from "recharts";
-import { FaCamera } from "react-icons/fa";
+import { FaCamera, FaChevronRight } from "react-icons/fa";
 import { FaEarthAfrica } from "react-icons/fa6";
 import { FaGear } from "react-icons/fa6";
 import { FaFire } from "react-icons/fa6";
@@ -339,7 +339,6 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                 type="file"
                 ref={fileInputRef}
                 accept="image/*"
-                capture="environment"
                 style={{ display: "none" }}
                 onChange={handleFileChange}
               />
@@ -542,7 +541,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                             rel="noreferrer"
                             className="tasting-search-link"
                           >
-                            Ver producto →
+                            Ver producto <FaChevronRight />
                           </a>
                         )}
                       </div>
@@ -727,7 +726,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   <label>Notas de cata</label>
                   <MentionInput
                     value={notas}
-                    onChange={(e) => setNotas(e.target.value)}
+                    onChange={setNotas}
                     placeholder="¿Qué sabores y aromas percibes?"
                     rows={3}
                     className="tasting-textarea"
