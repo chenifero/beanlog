@@ -13,6 +13,8 @@
 
 *Sip. Rate. Share.*
 
+*Puedes visitarla en:*
+https://beanlog-chi.vercel.app/
 </div>
 
 ---
@@ -27,11 +29,16 @@
 
 | Funcionalidad | Descripción |
 |---|---|
-| 📷 **OCR Inteligente** | Foto a la etiqueta del café → los datos se extraen automáticamente con IA |
+| 📷 **OCR Inteligente** | Foto a la etiqueta del café → los datos se extraen automáticamente con IA (Groq Vision) |
 | 🕸️ **Radar Chart Sensorial** | Visualiza acidez, cuerpo, dulzor, amargor, aroma y frutado de cada cata |
-| 🗺️ **Mapa de Cafeterías** | Guarda y explora cafeterías de especialidad en un mapa interactivo |
-| 📱 **Red Social** | Publica tus catas y visitas, sigue a otros usuarios, reacciona en tiempo real |
-| 🔐 **Autenticación** | Registro e inicio de sesión con Supabase Auth |
+| 🗺️ **Mapa de Cafeterías** | Guarda y explora cafeterías en un mapa interactivo con marcadores de colores según estado |
+| 📱 **Red Social** | Publica tus catas y visitas, sigue a otros usuarios, comenta y reacciona |
+| 🔔 **Notificaciones** | Recibe avisos de likes, comentarios, nuevos seguidores y publicaciones |
+| 🔖 **Publicaciones Guardadas** | Guarda posts para consultarlos después |
+| 💬 **Menciones** | Menciona a otros usuarios con `@username` en comentarios y posts |
+| ☕ **Estado de Cafeterías** | Marca cafeterías como "Quiero ir" o "Visitada" con reflejo en el mapa |
+| 🔐 **Autenticación** | Registro, inicio de sesión y recuperación de contraseña con Supabase Auth |
+| 💰 **Precio y link de compra** | Registra precio con selector de divisa y añade un enlace de compra a tus catas |
 
 ---
 
@@ -39,10 +46,9 @@
 
 1. El usuario fotografía la etiqueta del café desde móvil
 2. La imagen se envía a una Edge Function de Supabase
-3. La función llama a Google Cloud Vision o OpenAI Vision
-4. Extrae: nombre, origen, finca, proceso, tueste
-5. Si el café existe en el repositorio global → se precarga
-6. El usuario revisa, edita y guarda la cata
+3. La función llama a Groq Vision (`meta-llama/llama-4-scout-17b-16e-instruct`)
+4. Extrae: marca, nombre, origen, finca, proceso, tueste, variedad, sca, notas, altitud
+5. El usuario revisa, edita y guarda la cata
 
 > El formulario manual siempre está disponible como alternativa.
 
@@ -56,10 +62,12 @@
 | **Supabase** | Base de datos, Auth, Storage y Edge Functions |
 | **PostgreSQL + JSONB** | Almacenamiento del perfil sensorial (`radar_data`) |
 | **Recharts** | Radar chart del perfil sensorial |
-| **Mapbox GL JS** | Mapa interactivo de cafeterías |
-| **GSAP** | Animaciones de entrada y transiciones clave |
+| **Leaflet + react-leaflet** | Mapa interactivo de cafeterías |
 | **Vite** | Bundler y servidor de desarrollo |
-| **Google Cloud Vision / OpenAI Vision** | Motor OCR para extracción de etiquetas |
+| **Groq Vision** | Motor OCR para extracción de etiquetas |
+| **Photon (Komoot)** | Geocodificación gratuita sin API key |
+| **react-day-picker** | Selector de fecha tematizado |
+| **SerpAPI + Groq** | Búsqueda de precios de compra (feature opcional) |
 
 ---
 
@@ -69,12 +77,18 @@
 src/
 ├── components/
 │   ├── layout/      → AppShell, Sidebar, BottomNav
-│   ├── social/      → PostCard, CreatePostModal
+│   ├── social/      → PostCard, CreatePostModal, MentionInput, MentionText
+│   ├── tasting/     → TastingModal, TastingCard
 │   └── ui/          → Button, Card, Input, Avatar, Badge, Spinner
-├── context/         → AuthContext, SidebarContext, ToastContext
-├── hooks/           → useMediaQuery
-├── pages/           → HomePage, ProfilePages, SettingsPage, LoginPage...
-├── services/        → supabase.js, authService, postService, ocrService...
+├── context/         → AuthContext (+ unreadCount), SidebarContext, ToastContext
+├── hooks/           → useMediaQuery, useMentionSuggestions
+├── pages/           → HomePage, ProfilePages, SettingsPage, LoginPage,
+│                       UserProfilePage, NotificationsPage, PostDetailPage,
+│                       ResetPasswordPage
+├── services/        → supabase.js, authService, postService, ocrService,
+│                       coffeeShopService, coffeeShopStatusService,
+│                       savedPostsService, notificationService,
+│                       profileService, tastingService, coffeeSearchService
 └── styles/          → global.css, typography.css, animations.css, reset.css
 ```
 
@@ -83,15 +97,64 @@ src/
 ## 🗄️ Esquema de Base de Datos
 
 ```sql
-profiles       → usuarios de la app
-cafes_master   → repositorio global de cafés
-tastings       → catas personales (con radar_data JSONB)
-coffee_shops   → cafeterías con coordenadas
-posts          → publicaciones polimórficas (cata | visita)
-follows        → sistema de seguidores
-likes          → likes en tiempo real (Supabase Realtime)
-comments       → comentarios en posts
+profiles            → usuarios de la app (+ display_name, experience_level)
+cafes_master        → repositorio global de cafés (+ marca, sca)
+tastings            → catas personales con radar_data JSONB (+ precio, link_compra)
+coffee_shops        → cafeterías con coordenadas (+ ciudad, pais, notas, foto_urls[])
+posts               → publicaciones polimórficas (cata | visita | general)
+follows             → sistema de seguidores
+likes               → likes en posts
+comments            → comentarios en posts
+notifications       → notificaciones (like | comment | follow | new_post)
+saved_posts         → posts guardados por usuario
+user_coffee_shop_status → estado por usuario en cada cafetería (want_to_go | visited)
 ```
+
+---
+
+## 🗺️ Mapa de Cafeterías
+
+- Mapa Leaflet con tile CartoDB Voyager
+- Marcadores SVG con color según estado del usuario:
+  - 🟣 Por defecto (`#c349ee`)
+  - 🟡 Quiero ir (`#F5A623`)
+  - 🟢 Visitada (`#52C97A`)
+- Carrusel de fotos (hasta 5) en el panel de detalle
+- Leyenda interactiva para filtrar marcadores por tipo
+- Al guardar una cafetería se publica automáticamente un post de visita
+
+---
+
+## 🔔 Notificaciones
+
+Sistema completo con badge en sidebar y bottom navigation:
+
+- **like** — alguien da like a tu post
+- **comment** — alguien comenta tu post
+- **follow** — alguien te sigue
+- **new_post** — alguien a quien sigues publica
+
+El contador global se gestiona desde `AuthContext` y se resetea al entrar en la página de notificaciones.
+
+---
+
+## 💬 Menciones
+
+- Escribe `@` en cualquier input de texto para ver sugerencias de usuarios
+- Prioriza usuarios a los que sigues, con fallback a búsqueda global
+- Los `@username` se renderizan como texto clicable que navega al perfil
+
+---
+
+## 📱 Navegación
+
+**Web (≥ 768px)** — Sidebar colapsable (220px / 60px):
+Home · Mis Cafés · Mapa · Notificaciones · Ajustes
+
+**Móvil (< 768px)** — Bottom navigation bar:
+☕ Home · 🫘 Cafés · 🗺️ Mapa · 🔔 Notificaciones · 👤 Perfil
+
+> En móvil, el perfil tiene botón de engranaje para ir a Ajustes.
 
 ---
 
@@ -123,18 +186,16 @@ Copia `.env.example` como `.env.local` y rellena los valores:
 |---|---|
 | `VITE_SUPABASE_URL` | URL de tu proyecto Supabase |
 | `VITE_SUPABASE_ANON_KEY` | Clave anónima pública de Supabase |
-| `VITE_GOOGLE_CLOUD_API_KEY` | API Key de Google Cloud Vision (opcional) |
-| `VITE_MAPBOX_TOKEN` | Token de Mapbox GL JS |
-| `VITE_SERPAPI_KEY` | SerpAPI para búsqueda de tiendas (feature opcional) |
-| `VITE_GROQ_KEY` | Groq AI para rotación de proveedores (feature opcional) |
+
+> `SERPAPI_KEY` y `GROQ_KEY` se configuran únicamente como secrets en las Edge Functions de Supabase, nunca en el frontend.
 
 ---
 
-## 📱 Navegación
+## 📋 Backlog
 
-**Web (≥ 768px)** — Sidebar fija de 220px con: Home · Mis Cafés · Mapa · Estadísticas · Ajustes
-
-**Móvil (< 768px)** — Bottom navigation bar con 5 tabs: ☕ Home · 🫘 Cafés · 🗺️ Mapa · 📊 Stats · 👤 Perfil
+- [ ] Buscador de compra con rotación de proveedores AI (Groq → Together → OpenRouter)
+- [ ] Comparador de catas — superponer múltiples radares con Recharts
+- [ ] Exportar cata como tarjeta `.jpg` en formato 9:16 para Instagram Stories
 
 ---
 
