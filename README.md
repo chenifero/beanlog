@@ -61,7 +61,6 @@
 | **PostgreSQL + JSONB** | Almacenamiento del perfil sensorial (`radar_data`) |
 | **Recharts** | Radar chart del perfil sensorial |
 | **Leaflet + react-leaflet** | Mapa interactivo de cafeterías |
-| **GSAP** | Animaciones de entrada y transiciones clave |
 | **Vite** | Bundler y servidor de desarrollo |
 | **Groq Vision** | Motor OCR para extracción de etiquetas |
 | **Photon (Komoot)** | Geocodificación gratuita sin API key |
