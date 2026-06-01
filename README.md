@@ -13,6 +13,8 @@
 
 *Sip. Rate. Share.*
 
+*Puedes visitarla en:*
+https://beanlog-chi.vercel.app/
 </div>
 
 ---
