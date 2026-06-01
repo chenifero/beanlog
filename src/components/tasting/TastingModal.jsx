@@ -339,6 +339,7 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                 type="file"
                 ref={fileInputRef}
                 accept="image/*"
+                capture="environment"
                 style={{ display: "none" }}
                 onChange={handleFileChange}
               />
