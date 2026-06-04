@@ -173,6 +173,38 @@
   transition: opacity var(--transition-base);
 }
 
+.tasting-card-purchase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
 .tasting-card-buy-btn:hover {
   opacity: 0.85;
+}
+
+.tasting-card-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--amber);
+  color: white;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  border: none;
+  font-weight: 500;
+  transition: opacity var(--transition-base);
+  cursor: pointer;
+}
+
+.tasting-card-share:hover {
+  opacity: 0.85;
+}
+
+.tasting-card-share svg {
+  font-size: 1rem;
+  color: white;
 }

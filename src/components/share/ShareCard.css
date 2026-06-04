@@ -1,0 +1,261 @@
+/* ShareCard.css */
+
+/* Wrapper oculto fuera de pantalla — html2canvas lo captura igualmente */
+.sc-wrapper {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  z-index: -1;
+  width: 360px;
+}
+
+/* Padding exterior → la card no pega a los bordes al compartir */
+.sc-outer {
+  background: #ebf6c9;
+  padding: 16px;
+  width: 100%;
+}
+
+.sc-card-inner {
+  background: #ebf6c9;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1.5px solid #b8d890;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* ── Header ── */
+.sc-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  background: #c8e0a0;
+  border-bottom: 1px solid #b8d890;
+}
+
+.sc-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2e1560;
+  background: #ebf6c9;
+  border: 1.5px solid #b8d890;
+  border-radius: 24px;
+  padding: 7px 18px 7px 12px;
+}
+
+/* ── Foto ── */
+.sc-photo {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+.sc-photo-placeholder {
+  width: 100%;
+  height: 160px;
+}
+
+.sc-photo-placeholder--tasting {
+  background: linear-gradient(135deg, #c8e0a0 0%, #d4b8f0 100%);
+}
+
+.sc-photo-placeholder--post {
+  background: linear-gradient(135deg, #c8e0a0 0%, #a8d4f0 100%);
+}
+
+.sc-photo-placeholder--cafe {
+  background: linear-gradient(135deg, #c8e0a0 0%, #f0d4a0 100%);
+}
+
+/* ── Body ── */
+.sc-body {
+  padding: 12px 16px 10px;
+}
+
+.sc-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sc-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #c349ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sc-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sc-username {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2e1560;
+}
+
+.sc-handle {
+  font-size: 11px;
+  color: #9b72cc;
+}
+
+/* ── Tasting específico ── */
+.sc-tasting-name {
+  font-family: "Playfair Display", serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #2e1560;
+  line-height: 1.2;
+  margin-bottom: 3px;
+}
+
+.sc-tasting-meta {
+  font-size: 11px;
+  color: #7a4faa;
+  margin-bottom: 8px;
+}
+
+.sc-score-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.sc-score {
+  font-family: "Playfair Display", serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #c349ee;
+  line-height: 1;
+}
+
+.sc-score-label {
+  font-size: 11px;
+  color: #9b72cc;
+  line-height: 1.4;
+}
+
+.sc-radar-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0 4px;
+  overflow: visible;
+}
+
+.sc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.sc-chip {
+  font-size: 10px;
+  color: #7a4faa;
+  background: #c8e0a0;
+  border: 1px solid #b8d890;
+  border-radius: 20px;
+  padding: 3px 9px;
+}
+
+/* ── Post específico ── */
+.sc-post-text {
+  font-size: 12px;
+  color: #2e1560;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.sc-post-stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.sc-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #9b72cc;
+}
+
+/* ── Cafetería específico ── */
+.sc-cafe-name {
+  font-family: "Playfair Display", serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #2e1560;
+  margin-bottom: 3px;
+}
+
+.sc-cafe-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.sc-stars {
+  color: #c349ee;
+  font-size: 14px;
+  letter-spacing: -1px;
+}
+
+.sc-rating-num {
+  font-size: 12px;
+  color: #7a4faa;
+}
+
+.sc-cafe-note {
+  font-size: 11px;
+  color: #7a4faa;
+  line-height: 1.5;
+  font-style: italic;
+  border-left: 2px solid #b8d890;
+  padding-left: 8px;
+  margin-top: 6px;
+}
+
+/* ── Localización (post y cafetería) ── */
+.sc-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #7a4faa;
+  margin-bottom: 6px;
+}
+
+/* ── Footer ── */
+.sc-footer {
+  padding: 10px 16px 12px;
+  border-top: 1px solid #b8d890;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #c8e0a0;
+}
+
+.sc-logo {
+  height: 24px;
+  object-fit: contain;
+}

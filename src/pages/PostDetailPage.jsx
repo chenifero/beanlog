@@ -16,6 +16,9 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import MentionInput from "@/components/ui/MentionInput";
 import MentionText from "@/components/ui/MentionText";
 import "./PostDetailPage.css";
+import ShareCard from "@/components/share/ShareCard";
+import { useShareCard } from "@/components/share/useShareCard";
+import { FaShareSquare } from "react-icons/fa";
 
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -117,6 +120,7 @@ export default function PostDetailPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [shopStatus, setShopStatus] = useState(null);
+  const { cardRef, share, sharing } = useShareCard();
 
   const handleSave = async () => {
     setSaveLoading(true);
@@ -242,6 +246,7 @@ export default function PostDetailPage() {
         <button className="postdetail-back" onClick={() => navigate(-1)}>
           ✕
         </button>
+
         <div
           className="postdetail-avatar"
           onClick={() => navigate(`/user/${post.profiles?.username}`)}
@@ -261,6 +266,14 @@ export default function PostDetailPage() {
           </p>
           <p className="postdetail-handle">@{post.profiles?.username}</p>
         </div>
+        <button
+          className="postdetail-share"
+          onClick={() => share("cata-beanlog")}
+          disabled={sharing}
+        >
+          {sharing ? <FaShareSquare /> : <FaShareSquare />}
+        </button>
+        
         <div className="postdetail-header-right">
           <span className="postdetail-time">{timeAgo(post.created_at)}</span>
           {!isOwn && (
@@ -485,6 +498,16 @@ export default function PostDetailPage() {
           <FaPaperPlane />
         </button>
       </div>
+      <ShareCard
+        type="post"
+        data={{
+          post,
+          profiles: post.profiles,
+          likesCount,
+          commentsCount: comments.length,
+        }}
+        cardRef={cardRef}
+      />
     </div>
   );
 }

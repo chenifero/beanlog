@@ -18,7 +18,9 @@ import { FaChevronRight } from "react-icons/fa";
 import { FaPaperPlane } from "react-icons/fa";
 import { FaCartShopping } from "react-icons/fa6";
 import { coffeeShopStatusService } from "@/services/coffeeShopStatusService";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FaMapMarkerAlt, FaShareSquare } from "react-icons/fa";
+import ShareCard from "@/components/share/ShareCard";
+import { useShareCard } from "@/components/share/useShareCard";
 import MentionInput from "@/components/ui/MentionInput";
 import MentionText from "@/components/ui/MentionText";
 import Zoom from "react-medium-image-zoom";
@@ -140,6 +142,7 @@ export default function PostCard({ post, onDelete }) {
   const [commentsCount, setCommentsCount] = useState(0);
   const [shopStatus, setShopStatus] = useState(null);
 
+  const { cardRef, share, sharing } = useShareCard();
   const isOwner = user?.id === post.user_id;
   const photos = post.image_urls || [];
 
@@ -426,6 +429,16 @@ export default function PostCard({ post, onDelete }) {
         <button className="post-action-btn" onClick={handleToggleComments}>
           <FaComment /> {commentsCount > 0 && commentsCount}
         </button>
+        {post.type === "visit" && (
+          <button
+            className="post-action-btn"
+            onClick={() => share("cafeteria-beanlog")}
+            disabled={sharing}
+            title="Compartir"
+          >
+            <FaShareSquare />
+          </button>
+        )}
       </div>
 
       {/* Sección de comentarios */}
@@ -460,6 +473,18 @@ export default function PostCard({ post, onDelete }) {
             </button>
           </div>
         </div>
+      )}
+      {post.type === "visit" && (
+        <ShareCard
+          type="post"
+          data={{
+            post,
+            profile: post.profiles,
+            likesCount,
+            commentsCount,
+          }}
+          cardRef={cardRef}
+        />
       )}
     </article>
   );

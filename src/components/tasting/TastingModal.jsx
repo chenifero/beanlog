@@ -59,9 +59,7 @@ const STEPS = ["foto", "datos", "radar", "resumen"];
 export default function TastingModal({ onClose, onTastingCreated }) {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
-
   const radarRef = useRef(null); // Referencia para el radar chart para exportarlo como imagen
-
   const [step, setStep] = useState("foto");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -69,11 +67,9 @@ export default function TastingModal({ onClose, onTastingCreated }) {
   const [divisa, setDivisa] = useState("€");
   const [linkCompra, setLinkCompra] = useState("");
   const [showPicker, setShowPicker] = useState(false);
-
   // Foto
   const [labelFile, setLabelFile] = useState(null);
   const [labelPreview, setLabelPreview] = useState(null);
-
   // Datos del café — prellenados por OCR
   const [cafeData, setCafeData] = useState({
     marca: "",
@@ -85,13 +81,11 @@ export default function TastingModal({ onClose, onTastingCreated }) {
     variedad: "",
     sca: "",
   });
-
   // Datos de la cata
   const [puntuacion, setPuntuacion] = useState(7);
   const [notas, setNotas] = useState("");
   const [radarData, setRadarData] = useState(DEFAULT_RADAR);
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
-
   // Búsqueda de compra
   const [searchResult, setSearchResult] = useState(null);
   const [searching, setSearching] = useState(false);
@@ -384,7 +378,13 @@ export default function TastingModal({ onClose, onTastingCreated }) {
                   onClick={handleScanLabel}
                   disabled={!labelFile || loading}
                 >
-                  {loading ? "Escaneando..." : <>Escanear con IA <BsStars /></>}
+                  {loading ? (
+                    "Escaneando..."
+                  ) : (
+                    <>
+                      Escanear con IA <BsStars />
+                    </>
+                  )}
                 </button>
               </div>
             </div>

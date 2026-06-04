@@ -79,11 +79,16 @@
 }
 
 .postdetail-header-right {
-  display: flex;
+  display: ruby;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.3rem;
   flex-shrink: 0;
+}
+
+
+.postdetail-share svg {
+  font-size: 1.4rem;
+  color: var(--text-dim);
 }
 
 .postdetail-time {
