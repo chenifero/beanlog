@@ -13,7 +13,7 @@
   padding: var(--spacing-xl) 0;
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 110vh;
   overflow-y: auto;
 }
 
