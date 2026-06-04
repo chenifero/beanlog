@@ -18,6 +18,7 @@ import UserProfilePage from '@/pages/UserProfilePage'
 import ResetPasswordPage from '@/pages/ResetPasswordPage'
 import PostDetailPage from '@/pages/PostDetailPage'
 import NotificationsPage from '@/pages/NotificationsPage'
+import 'react-medium-image-zoom/dist/styles.css';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth()

@@ -9,6 +9,7 @@ import '@/styles/reset.css'
 import '@/styles/global.css'
 import '@/styles/typography.css'
 import '@/styles/animations.css'
+import 'react-medium-image-zoom/dist/styles.css';
 
 
 if ('serviceWorker' in navigator) {

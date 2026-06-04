@@ -21,6 +21,8 @@ import { coffeeShopStatusService } from "@/services/coffeeShopStatusService";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import MentionInput from "@/components/ui/MentionInput";
 import MentionText from "@/components/ui/MentionText";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 
 // Formatea la fecha relativa — "hace 2 horas", "hace 3 días"
 function timeAgo(dateStr) {
@@ -285,11 +287,13 @@ export default function PostCard({ post, onDelete }) {
       >
         {photos.length > 0 && (
           <div className="post-photos">
-            <img
-              src={photos[currentPhoto]}
-              alt={`foto ${currentPhoto + 1}`}
-              className="post-photo"
-            />
+            <Zoom>
+              <img
+                src={photos[currentPhoto]}
+                alt={`foto ${currentPhoto + 1}`}
+                className="post-photo"
+              />
+            </Zoom>
             {/* Controles del carrusel — solo si hay más de una foto */}
             {photos.length > 1 && (
               <>
