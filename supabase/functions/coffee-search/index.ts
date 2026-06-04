@@ -1,6 +1,6 @@
 // Edge Function: coffee-search
-// Recibe el nombre de un café, busca en web con SerpAPI
-// y usa Groq para extraer precio, foto y enlace de compra
+// Busca el café priorizando la web de la tostadora en los resultados orgánicos.
+// Sin paso por LLM — procesa los datos de SerpAPI directamente.
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
@@ -9,34 +9,71 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Palabras genéricas del sector que no identifican un tostador concreto
+const GENERIC_WORDS = new Set([
+  'cafe', 'coffee', 'espresso', 'brew', 'roast', 'roastery',
+  'specialty', 'speciality', 'tienda', 'shop', 'store',
+])
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]/g, '')
+}
+
+// Devuelve true si la URL parece pertenecer al dominio del tostador.
+// Ejemplo: "Nomad Coffee" → busca "nomad" en la URL (ignora "coffee").
+function isRoasterSite(url: string, marca: string): boolean {
+  if (!marca || !url) return false
+  const significantWords = marca
+    .toLowerCase()
+    .split(/\s+/)
+    .map(slugify)
+    .filter(w => w.length > 3 && !GENERIC_WORDS.has(w))
+
+  if (significantWords.length === 0) return false
+
+  const urlSlug = slugify(url)
+  return significantWords.some(word => urlSlug.includes(word))
+}
+
 serve(async (req) => {
-  // Manejo de CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { coffeeName } = await req.json()
+    const { nombre, marca, origen, proceso } = await req.json()
 
-    if (!coffeeName) {
+    if (!nombre) {
       return new Response(
-        JSON.stringify({ error: 'coffeeName es requerido' }),
+        JSON.stringify({ error: 'nombre es requerido' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       )
     }
 
     const SERPAPI_KEY = Deno.env.get('SERPAPI_KEY')
-    const GROQ_KEY = Deno.env.get('GROQ_KEY')
 
-    // 1. Busca el café en Google Shopping con SerpAPI
-    const searchQuery = `${coffeeName} café especialidad comprar precio`
-    const serpUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(searchQuery)}&tbm=shop&hl=es&gl=es&api_key=${SERPAPI_KEY}`
+    // Con marca: query precisa → "Nomad Coffee Ethiopia Natural comprar"
+    // Sin marca: añade contexto de especialidad para no mezclar con café de supermercado
+    const queryParts = marca
+      ? [marca, nombre, 'comprar']
+      : [nombre, origen, 'café especialidad comprar'].filter(Boolean)
+    const query = queryParts.join(' ')
+
+    console.log('coffee-search query:', query)
+
+    // Google Search normal — devuelve organic_results siempre y
+    // shopping_results cuando Google muestra el panel lateral de compras.
+    const serpUrl = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&hl=es&gl=es&num=8&api_key=${SERPAPI_KEY}`
 
     const serpRes = await fetch(serpUrl)
     const serpData = await serpRes.json()
 
-    // Extrae los primeros 3 resultados de shopping
-    const shoppingResults = (serpData.shopping_results || []).slice(0, 3).map((r: any) => ({
+    const organicResults: any[] = serpData.organic_results || []
+    const shoppingResults = (serpData.shopping_results || []).slice(0, 5).map((r: any) => ({
       title: r.title,
       price: r.price,
       source: r.source,
@@ -44,66 +81,45 @@ serve(async (req) => {
       thumbnail: r.thumbnail,
     }))
 
-    // Si no hay resultados de shopping, busca resultados orgánicos
-    const organicResults = (serpData.organic_results || []).slice(0, 2).map((r: any) => ({
-    title: r.title,
-    snippet: r.snippet?.slice(0, 200), // limita el snippet
-    link: r.link,
-    }))
+    console.log('organic_results:', organicResults.length)
+    console.log('shopping_results:', shoppingResults.length)
 
-    // 2. Usa Groq para procesar y resumir los resultados
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        max_tokens: 500,
-        messages: [
-          {
-            role: 'system',
-            content: 'Eres un asistente especializado en café de especialidad. Responde SOLO en JSON válido, sin texto adicional ni markdown.'
-          },
-          {
-            role: 'user',
-            content: `Analiza estos resultados de búsqueda para el café "${coffeeName}" y extrae la información más relevante.
+    // Prioridad 1 — web del tostador (URL contiene nombre de la marca)
+    // Prioridad 2 — cualquier resultado orgánico
+    // Prioridad 3 — panel de shopping (si no hay orgánicos)
+    const roasterResult = marca
+      ? organicResults.find(r => isRoasterSite(r.link, marca))
+      : null
 
-Resultados de shopping: ${JSON.stringify(shoppingResults)}
-Resultados orgánicos: ${JSON.stringify(organicResults)}
+    const bestOrganic = roasterResult ?? organicResults[0] ?? null
 
-Responde SOLO con este JSON:
-{
-  "found": true/false,
-  "bestPrice": "precio más bajo encontrado o null",
-  "priceRange": "rango de precios o null",
-  "bestLink": "mejor enlace de compra o null",
-  "bestImage": "mejor URL de imagen del producto o null",
-  "source": "nombre de la tienda o null",
-  "summary": "resumen de 1 frase sobre dónde y a qué precio se puede comprar"
-}`
-          }
-        ]
-      })
-    })
+    let result: any = { found: false, shoppingResults }
 
-    const groqData = await groqRes.json()
-    const rawContent = groqData.choices?.[0]?.message?.content || '{}'
+    if (bestOrganic) {
+      // Si hay panel de shopping, aprovecha su precio (más estructurado que un snippet)
+      const shopPrice = shoppingResults[0]?.price ?? null
 
-    // Parsea la respuesta de Groq
-    let result
-    try {
-      result = JSON.parse(rawContent)
-      Object.keys(result).forEach(key => {
-        if (result[key] === 'null') result[key] = null
-      })
-    } catch {
-      result = { found: false, summary: 'No se encontró información de compra' }
+      result = {
+        found: true,
+        bestPrice: shopPrice,
+        bestLink: bestOrganic.link ?? null,
+        bestImage: bestOrganic.thumbnail ?? null,
+        source: bestOrganic.displayed_link ?? null,
+        isRoasterSite: !!roasterResult,
+        shoppingResults,
+      }
+    } else if (shoppingResults.length > 0) {
+      const best = shoppingResults[0]
+      result = {
+        found: true,
+        bestPrice: best.price ?? null,
+        bestLink: best.link ?? null,
+        bestImage: best.thumbnail ?? null,
+        source: best.source ?? null,
+        isRoasterSite: false,
+        shoppingResults,
+      }
     }
-
-    // Añade los resultados de shopping directos por si el frontend los quiere mostrar
-    result.shoppingResults = shoppingResults
 
     return new Response(
       JSON.stringify(result),

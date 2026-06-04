@@ -138,9 +138,12 @@ export default function TastingModal({ onClose, onTastingCreated }) {
     if (!cafeData.nombre) return;
     setSearching(true);
     try {
-      const result = await coffeeSearchService.searchCoffee(
-        `${cafeData.nombre} ${cafeData.origen || ""}`,
-      );
+      const result = await coffeeSearchService.searchCoffee({
+        nombre: cafeData.nombre,
+        marca: cafeData.marca,
+        origen: cafeData.origen,
+        proceso: cafeData.proceso,
+      });
       setSearchResult(result);
       if (result?.bestPrice) setPrecio(result.bestPrice);
     } catch (err) {
@@ -514,7 +517,18 @@ export default function TastingModal({ onClose, onTastingCreated }) {
 
                   {searchResult?.found && (
                     <div className="tasting-search-result">
-                      {/* Botón X para cerrar el resultado */}
+                      {searchResult.bestLink && (
+                        <button
+                          className="tasting-search-confirm"
+                          title="Usar este enlace"
+                          onClick={() => {
+                            setLinkCompra(searchResult.bestLink);
+                            setSearchResult(null);
+                          }}
+                        >
+                          <FaCheck />
+                        </button>
+                      )}
                       <button
                         className="tasting-search-close"
                         onClick={() => setSearchResult(null)}
