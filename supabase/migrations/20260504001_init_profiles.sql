@@ -12,23 +12,25 @@ create table if not exists profiles (
 
 -- Crear índices
 create index if not exists idx_profiles_username on profiles(username);
-create index if not exists idx_profiles_email on profiles(email);
 
 -- Habilitar RLS (Row Level Security)
 alter table profiles enable row level security;
 
 -- Política: Usuarios pueden ver todos los perfiles públicamente
+drop policy if exists "Perfiles are publicly readable" on profiles;
 create policy "Perfiles are publicly readable"
   on profiles for select
   using (true);
 
 -- Política: Usuarios pueden actualizar solo su propio perfil
+drop policy if exists "Users can update their own profile" on profiles;
 create policy "Users can update their own profile"
   on profiles for update
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
 -- Política: Usuarios pueden insertar su propio perfil
+drop policy if exists "Users can insert their own profile" on profiles;
 create policy "Users can insert their own profile"
   on profiles for insert
   with check (auth.uid() = id);

@@ -370,9 +370,8 @@ export default function SettingsPage() {
     setDeletingAccount(true);
     setDeleteError("");
     try {
-      const { error } = await supabase.rpc("delete_user");
-      if (error) throw error;
-      await authService.signOut();
+      await authService.deleteAccount();
+      localStorage.removeItem('beanlog_onboarding_v1');
       navigate("/login");
     } catch (err) {
       setDeleteError("Error al eliminar la cuenta. Inténtalo de nuevo.");

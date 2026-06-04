@@ -85,4 +85,10 @@ export const authService = {
     if (error) throw error;
     return data;
   },
+
+  async deleteAccount() {
+    // Llama a la Edge Function que elimina el usuario de auth + datos
+    const { error } = await supabase.functions.invoke('delete-user-account');
+    if (error) throw error;
+  },
 };

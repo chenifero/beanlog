@@ -73,6 +73,19 @@ export const profileService = {
     return data.id === currentUserId // existe pero es el propio usuario → disponible
   },
 
+  // Marca el onboarding como completado
+  async completeOnboarding(userId) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ onboarding_completed: true })
+      .eq('id', userId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  },
+
   //Obtiene perfil por username para mostrar perfiles públicos
   async getProfileByUsername(username) {
     const { data, error } = await supabase

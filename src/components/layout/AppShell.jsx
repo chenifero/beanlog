@@ -17,8 +17,8 @@ export default function AppShell({ children }) {
     () => localStorage.getItem(ONBOARDING_STORAGE_KEY) === 'done'
   )
 
-  const needsSetup = profile !== null && !profile?.display_name
-  const showTour   = profile !== null && !needsSetup && !tourDone
+  const showTour   = profile !== null && !tourDone
+  const needsSetup = profile !== null && tourDone && !profile?.display_name
 
   const handleSetupComplete = async () => {
     await refreshProfile(user.id)
