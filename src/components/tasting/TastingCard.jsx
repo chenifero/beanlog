@@ -115,7 +115,7 @@ function TastingChips({ cafe, tasting }) {
 }
 
 export default function TastingCard({ tasting, onDelete }) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const { cardRef, share, sharing } = useShareCard();
 
@@ -264,7 +264,7 @@ export default function TastingCard({ tasting, onDelete }) {
           </div>
           <ShareCard
             type="tasting"
-            data={{ tasting, cafe }}
+            data={{ tasting, profile }}
             cardRef={cardRef}
           />
         </div>

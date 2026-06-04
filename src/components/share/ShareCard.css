@@ -6,14 +6,18 @@
   top: -9999px;
   left: -9999px;
   z-index: -1;
-  width: 360px;
 }
 
-/* Padding exterior → la card no pega a los bordes al compartir */
+/* Área de captura: ratio ~19.5:9 (360×780) → a scale:3 = 1080×2340 (rellena pantallas modernas) */
 .sc-outer {
   background: #ebf6c9;
+  width: 360px;
+  height: 780px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
   padding: 16px;
-  width: 100%;
 }
 
 .sc-card-inner {
@@ -22,6 +26,7 @@
   overflow: hidden;
   border: 1.5px solid #b8d890;
   font-family: "DM Sans", sans-serif;
+  width: 100%;
 }
 
 /* ── Header ── */
@@ -45,6 +50,7 @@
   border: 1.5px solid #b8d890;
   border-radius: 24px;
   padding: 7px 18px 7px 12px;
+  margin: 0 auto;
 }
 
 /* ── Foto ── */
@@ -258,4 +264,6 @@
 .sc-logo {
   height: 24px;
   object-fit: contain;
+  display: block;
+  margin: 0 auto;
 }

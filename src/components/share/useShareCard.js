@@ -17,7 +17,7 @@ export function useShareCard() {
       const canvas = await html2canvas(cardRef.current, {
         useCORS: true,          // necesario para imágenes de Supabase Storage
         allowTaint: false,
-        scale: 2,               // resolución 2x para que se vea nítida en móvil
+        scale: 3,               // escala 3x: 360×640 → 1080×1920 (Instagram Stories)
         backgroundColor: null,
         logging: false,
       });

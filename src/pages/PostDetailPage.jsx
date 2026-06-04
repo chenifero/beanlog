@@ -502,7 +502,7 @@ export default function PostDetailPage() {
         type="post"
         data={{
           post,
-          profiles: post.profiles,
+          profile: post.profiles,
           likesCount,
           commentsCount: comments.length,
         }}

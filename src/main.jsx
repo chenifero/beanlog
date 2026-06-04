@@ -10,11 +10,22 @@ import '@/styles/global.css'
 import '@/styles/typography.css'
 import '@/styles/animations.css'
 import 'react-medium-image-zoom/dist/styles.css';
+import { registerSW } from 'virtual:pwa-register';
 
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js')
 }
+
+registerSW({
+  onNeedRefresh() {
+    // Nueva versión disponible → recarga automática
+    window.location.reload();
+  },
+  onOfflineReady() {
+    console.log('BeanLog lista para usar offline');
+  },
+});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

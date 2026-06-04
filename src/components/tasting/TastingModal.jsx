@@ -26,7 +26,7 @@ import { FaCheck } from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { ORIGENES, PROCESOS, TUESTES } from "@/utils/coffeeConstants";
+import { ORIGENES, PROCESOS, TUESTES, normalizeProceso, normalizeTueste, normalizeOrigen } from "@/utils/coffeeConstants";
 import html2canvas from "html2canvas";
 import { postService } from "@/services/postService";
 import MentionInput from "@/components/ui/MentionInput";
@@ -114,10 +114,10 @@ export default function TastingModal({ onClose, onTastingCreated }) {
       setCafeData({
         marca: result.marca !== "null" ? result.marca || "" : "",
         nombre: result.nombre !== "null" ? result.nombre || "" : "",
-        origen: result.origen !== "null" ? result.origen || "" : "",
+        origen: normalizeOrigen(result.origen),
         finca: result.finca !== "null" ? result.finca || "" : "",
-        proceso: result.proceso !== "null" ? result.proceso || "" : "",
-        tueste: result.tueste !== "null" ? result.tueste || "" : "",
+        proceso: normalizeProceso(result.proceso),
+        tueste: normalizeTueste(result.tueste),
         variedad: result.variedad !== "null" ? result.variedad || "" : "",
         sca: result.sca !== "null" ? result.sca || "" : "",
       });
